@@ -1,0 +1,34 @@
+@startuml
+
+state GetChannelHistory as "Get History" : Gather daily messages
+state FormatChannelHistory as "Format History" : Format one message per line
+state AppendData as "Append to CSV" : Append messages to CSV
+
+state ProcessMessages as "Post-process Messages" {
+  state ExtractSentences as "Extract Sentences"
+  state ExtractLinks as "Extract Links"
+  state ExtractImages as "Extract Images"
+  state SentimentAnalysis as "Sentiment Analysis"
+  state DocumentAnalysis as "Document Analysis"
+  state ImageRecognition as "Image Recognition"
+
+  [*] --> ExtractSentences
+  [*] --> ExtractLinks
+  [*] --> ExtractImages
+
+  ExtractSentences --> SentimentAnalysis
+  ExtractLinks --> DocumentAnalysis
+  ExtractImages --> ImageRecognition
+
+  SentimentAnalysis --> [*]
+  DocumentAnalysis --> [*]
+  ImageRecognition --> [*]
+}
+
+[*] --> GetChannelHistory : Cron Ran
+GetChannelHistory -> FormatChannelHistory : Gathered
+FormatChannelHistory --> AppendData : Formatted
+FormatChannelHistory -> ProcessMessages: New object
+ProcessMessages --> AppendData : Post-processed
+
+@enduml

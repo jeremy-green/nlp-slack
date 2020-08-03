@@ -1,0 +1,19 @@
+{
+  "name": "@nlp-slack/channel-history",
+  "version": "0.0.0",
+  "description": "> TODO: description",
+  "author": "Jeremy Green <hello@jeremy.green>",
+  "homepage": "",
+  "license": "ISC",
+  "main": "index.js",
+  "scripts": {
+    "build": "mkdir -p ../../tmp && zip -r ../../tmp/channel-history.zip .",
+    "update": "aws lambda update-function-code --function getChannelHistory --zip-file fileb://../../tmp/channel-history.zip",
+    "publish": "npm run build && npm run update",
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "dependencies": {
+    "@slack/web-api": "^5.10.0",
+    "config": "^3.3.1"
+  }
+}

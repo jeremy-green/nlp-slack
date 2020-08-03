@@ -1,0 +1,10 @@
+{
+  "accessKeyId": "ACCESS_KEY_ID",
+  "botToken": "BOT_TOKEN",
+  "bucket": "S3_BUCKET",
+  "prefix": "S3_PREFIX",
+  "secretAccessKey": "SECRET_ACCESS_KEY",
+  "channel": "SLACK_CHANNEL",
+  "fullHistory": "FULL_HISTORY",
+  "region": "AWS_REGION"
+}

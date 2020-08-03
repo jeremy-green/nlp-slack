@@ -1,0 +1,17 @@
+{
+  "name": "nlp-slack",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "create-react-app": "^3.4.1",
+    "express-generator": "^4.16.1",
+    "lerna": "^3.22.1"
+  }
+}

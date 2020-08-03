@@ -1,0 +1,18 @@
+version: '3'
+services:
+  localstack:
+    image: 'localstack/localstack'
+    ports:
+      - 4566-4580:4566-4580
+      - 8080:8080
+    volumes:
+      - '/var/run/docker.sock:/var/run/docker.sock'
+    environment:
+      - SERVICES=lambda,stepfunctions
+      - DEBUG=1
+      - AWS_ACCESS_KEY=foobar
+      - AWS_SECRET_ACCESS_KEY=foobar
+      - DATA_DIR=/tmp/localstack/data
+      - LAMBDA_DOCKER_NETWORK=nlp-slack_default
+      - NODE_ENV=development
+      - LAMBDA_EXECUTOR=docker-reuse

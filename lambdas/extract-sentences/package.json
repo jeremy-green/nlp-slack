@@ -1,0 +1,14 @@
+{
+  "name": "@nlp-slack/extract-sentences",
+  "version": "0.0.0",
+  "description": "Now I’m the model of a modern major general / The venerated Virginian veteran whose men are all / Lining up, to put me up on a pedestal / Writin’ letters to relatives / Embellishin’ my elegance and eloquence / But the elephant is in the room / The truth is in ya face when ya hear the British cannons go / BOOM",
+  "keywords": [],
+  "author": "Jeremy Green <hello@jeremy.green>",
+  "license": "ISC",
+  "main": "lambda_function.py",
+  "scripts": {
+    "build": "mkdir -p ../../tmp && zip -r ../../tmp/extract-sentences.zip lambda_function.py",
+    "update": "aws lambda update-function-code --function extractSentences --zip-file fileb://../../tmp/extract-sentences.zip",
+    "publish": "npm run build && npm run update"
+  }
+}

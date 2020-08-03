@@ -1,0 +1,10 @@
+node_modules
+tmp
+*.log
+.DS_Store
+
+# not ready for public viewing
+get-sentiment
+
+# Store pieces of code that might be useful again... but mostly garbage
+junk
