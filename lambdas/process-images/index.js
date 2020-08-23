@@ -4,7 +4,6 @@ const fetch = require('node-fetch');
 const { DynamoDB, Rekognition } = require('aws-sdk');
 
 const { accessKeyId, secretAccessKey, region, botToken } = require('config');
-const c = require('config');
 
 const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
 const rekognition = new Rekognition({ region, accessKeyId, secretAccessKey });
