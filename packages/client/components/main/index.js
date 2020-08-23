@@ -10,8 +10,8 @@ export default class extends React.Component {
 
   async componentDidMount() {
     // @see: https://github.com/and-who/react-p5-wrapper/issues/2#issuecomment-304523713
-    const p5 = await import('p5').then(m => m.default);
-    this.p5 = new p5(sketch => {
+    const p5 = await import('p5').then((m) => m.default);
+    this.p5 = new p5((sketch) => {
       sketch.setup = () => {
         sketch.createCanvas(200, 200);
       };
