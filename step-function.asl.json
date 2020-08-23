@@ -1,0 +1,67 @@
+{
+  "Comment": "JEREMY RULES!!!",
+  "StartAt": "Get Channel History",
+  "States": {
+
+    "Get Channel History": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "getChannelHistory"
+      },
+      "Next": "Format Channel History",
+      "TimeoutSeconds": 600
+    },
+
+    "Format Channel History": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "formatHistory",
+        "Payload": {
+          "history.$": "$.Payload.history"
+        }
+      },
+      "TimeoutSeconds": 600,
+      "Next": "Process Superfluous Info"
+    },
+
+    "Process Superfluous Info": {
+      "Type": "Parallel",
+      "Branches": [{
+        "StartAt": "Extract Sentences",
+        "States": {
+
+          "Extract Sentences": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Parameters": {
+              "FunctionName": "extractSentences",
+              "Payload": {
+                "history.$": "$.Payload.history"
+              }
+            },
+            "TimeoutSeconds": 600,
+            "Next": "Process Sentiment"
+          },
+
+          "Process Sentiment": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Parameters": {
+              "FunctionName": "getSentiment",
+              "Payload": {
+                "history.$": "$.Payload.history"
+              }
+            },
+            "TimeoutSeconds": 600,
+            "End": true
+          }
+
+        }
+      }],
+      "End": true
+    }
+
+  }
+}

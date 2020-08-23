@@ -23,7 +23,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lerna run publish --stream"
+      "pre-commit": "./scripts/pre-commit.sh"
     }
   }
 }
