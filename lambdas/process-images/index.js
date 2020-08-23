@@ -56,6 +56,7 @@ exports.handler = (event) => {
       //   },
       // };
 
+      console.log(dynamodb);
       // return dynamodb.updateItem(payload).promise();
     }),
   );
