@@ -1,0 +1,20 @@
+{
+  "name": "@nlp-slack/get-sentiment",
+  "version": "0.0.0",
+  "description": "",
+  "keywords": [],
+  "author": "Jeremy Green <hello@jeremy.green>",
+  "license": "ISC",
+  "main": "index.js",
+  "scripts": {
+    "build": "mkdir -p ../../tmp && zip -r ../../tmp/get-sentiment.zip .",
+    "update": "aws lambda update-function-code --function getSentiment --zip-file fileb://../../tmp/get-sentiment.zip",
+    "publish": "npm run lint && npm run build && npm run update",
+    "lint": "npx eslint index.js",
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "dependencies": {
+    "config": "^3.3.1",
+    "p-limit": "^3.0.2"
+  }
+}
