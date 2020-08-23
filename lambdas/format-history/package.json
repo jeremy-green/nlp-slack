@@ -9,10 +9,13 @@
   "scripts": {
     "build": "mkdir -p ../../tmp && zip -r ../../tmp/format-history.zip .",
     "update": "aws lambda update-function-code --function formatHistory --zip-file fileb://../../tmp/format-history.zip",
-    "publish": "npm run build && npm run update",
+    "publish": "npm run lint && npm run build && npm run update",
+    "lint": "npx eslint index.js",
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
-    "config": "^3.3.1"
+    "config": "^3.3.1",
+    "p-limit": "^3.0.2",
+    "uuid": "^8.3.0"
   }
 }

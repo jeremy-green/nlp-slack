@@ -1,50 +1,48 @@
-const { EOL } = require('os');
+const pLimit = require('p-limit');
 
-const { S3 } = require('aws-sdk');
+const { DynamoDB } = require('aws-sdk');
+const { v4: uuid } = require('uuid');
+const { accessKeyId, secretAccessKey, region } = require('config');
 
-const { accessKeyId, secretAccessKey, region, prefix } = require('config');
+const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
 
-const s3 = new S3({ region, accessKeyId, secretAccessKey });
+const limit = pLimit(10);
 
-exports.handler = event => {
-  const { Records: records } = event;
-  records.forEach(async ({ s3: s3Property }) => {
-    const {
-      bucket: { name },
-      object: { key },
-    } = s3Property;
-
-    const params = {
-      Bucket: name,
-      Key: key,
+function processHistory(item) {
+  const parsed = JSON.parse(item);
+  const dynamicObj = Object.keys(parsed).reduce((acc, curr) => {
+    acc[curr] = {
+      S:
+        typeof parsed[curr] === 'string'
+          ? parsed[curr]
+          : JSON.stringify(parsed[curr]),
     };
 
-    const data = await s3.getObject(params).promise();
+    return acc;
+  }, {});
 
-    const payload = data.Body.toString('utf-8').split(EOL);
+  return dynamodb
+    .putItem({
+      TableName: 'messages',
+      Item: { ...dynamicObj, __appid: { S: uuid() } },
+    })
+    .promise();
+}
 
-    const allMessages = payload.reduce((acc, curr) => {
+exports.handler = async (event) => {
+  const { history } = event;
+
+  const allMessages = history
+    .reduce((acc, curr) => {
       const { messages } = JSON.parse(curr);
-      const tmp = messages.map(message => JSON.stringify(message));
+      const tmp = messages.map((message) => JSON.stringify(message));
       return [...acc, ...tmp];
-    }, []);
+    }, [])
+    .reverse();
 
-    const newKey = `${prefix}/${key.split('/')[1]}`;
-    const buffer = Buffer.from(allMessages.join(EOL));
+  const input = allMessages.map((item) => limit(() => processHistory(item)));
 
-    try {
-      const params = {
-        Bucket: name,
-        Key: newKey,
-        Body: buffer,
-        ContentType: 'text/plain',
-      };
+  await Promise.all(input);
 
-      await s3.putObject(params).promise();
-    } catch (error) {
-      console.log(error);
-    }
-  });
-
-  return { statusCode: 204 };
+  return { history: allMessages };
 };
