@@ -14,12 +14,7 @@ function getImages(history) {
   return history.reduce((acc, curr) => {
     const { ts, files = [] } = JSON.parse(curr);
 
-    return [
-      ...acc,
-      ...files.map((file) => {
-        return { ts, file };
-      }),
-    ];
+    return [...acc, { ts, files }];
   }, []);
 }
 
