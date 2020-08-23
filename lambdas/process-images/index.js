@@ -28,7 +28,7 @@ exports.handler = (event) => {
       const { ts, files } = imageObj;
       console.log(files);
       const analyzedFiles = await Promise.all(
-        files.map((file) => {
+        files.map(async (file) => {
           const { url_private: urlPrivate } = file;
           const buffer = await fetch(urlPrivate, {
             headers: { Authorization: `Bearer ${botToken}` },
