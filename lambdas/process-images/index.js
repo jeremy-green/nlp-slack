@@ -13,8 +13,10 @@ const limit = pLimit(10);
 function getImages(history) {
   return history.reduce((acc, curr) => {
     const { ts, files = [] } = JSON.parse(curr);
-
-    return [...acc, { ts, files }];
+    if (files.length) {
+      return [...acc, { ts, files }];
+    }
+    return { ...acc };
   }, []);
 }
 
