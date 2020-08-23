@@ -16,7 +16,7 @@ function getImages(history) {
     if (files.length) {
       return [...acc, { ts, files }];
     }
-    return { ...acc };
+    return [...acc];
   }, []);
 }
 
