@@ -31,21 +31,8 @@
       "Next": "Save to CSV",
       "Branches": [
         {
-          "StartAt": "Extract Images",
+          "StartAt": "Process Images",
           "States": {
-
-            "Extract Images": {
-              "Type": "Task",
-              "Resource": "arn:aws:states:::lambda:invoke",
-              "Parameters": {
-                "FunctionName": "extractImages",
-                "Payload": {
-                  "history.$": "$.Payload.history"
-                }
-              },
-              "TimeoutSeconds": 300,
-              "Next": "Process Images"
-            },
 
             "Process Images": {
               "Type": "Task",
@@ -53,7 +40,7 @@
               "Parameters": {
                 "FunctionName": "processImages",
                 "Payload": {
-                  "images.$": "$.Payload.images"
+                  "history.$": "$.Payload.history"
                 }
               },
               "TimeoutSeconds": 300,
