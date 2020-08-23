@@ -35,7 +35,7 @@ exports.handler = (event) => {
         },
       };
 
-      const response = rekognition.detectLabels(params).promise();
+      const response = await rekognition.detectLabels(params).promise();
       console.log(response);
     }),
   );
