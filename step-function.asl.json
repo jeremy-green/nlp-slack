@@ -22,44 +22,91 @@
           "history.$": "$.Payload.history"
         }
       },
-      "TimeoutSeconds": 600,
+      "TimeoutSeconds": 300,
       "Next": "Process Superfluous Info"
     },
 
     "Process Superfluous Info": {
       "Type": "Parallel",
-      "Branches": [{
-        "StartAt": "Extract Sentences",
-        "States": {
+      "Next": "Save to CSV",
+      "Branches": [
+        {
+          "StartAt": "Extract Images",
+          "States": {
 
-          "Extract Sentences": {
-            "Type": "Task",
-            "Resource": "arn:aws:states:::lambda:invoke",
-            "Parameters": {
-              "FunctionName": "extractSentences",
-              "Payload": {
-                "history.$": "$.Payload.history"
-              }
+            "Extract Images": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke",
+              "Parameters": {
+                "FunctionName": "extractImages",
+                "Payload": {
+                  "history.$": "$.Payload.history"
+                }
+              },
+              "TimeoutSeconds": 300,
+              "Next": "Process Images"
             },
-            "TimeoutSeconds": 600,
-            "Next": "Process Sentiment"
-          },
 
-          "Process Sentiment": {
-            "Type": "Task",
-            "Resource": "arn:aws:states:::lambda:invoke",
-            "Parameters": {
-              "FunctionName": "getSentiment",
-              "Payload": {
-                "history.$": "$.Payload.history"
-              }
-            },
-            "TimeoutSeconds": 600,
-            "End": true
+            "Process Images": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke",
+              "Parameters": {
+                "FunctionName": "processImages",
+                "Payload": {
+                  "images.$": "$.Payload.images"
+                }
+              },
+              "TimeoutSeconds": 300,
+              "End": true
+            }
           }
 
+        },
+        {
+          "StartAt": "Extract Sentences",
+          "States": {
+
+            "Extract Sentences": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke",
+              "Parameters": {
+                "FunctionName": "extractSentences",
+                "Payload": {
+                  "history.$": "$.Payload.history"
+                }
+              },
+              "TimeoutSeconds": 300,
+              "Next": "Process Sentiment"
+            },
+
+            "Process Sentiment": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke",
+              "Parameters": {
+                "FunctionName": "getSentiment",
+                "Payload": {
+                  "history.$": "$.Payload.history"
+                }
+              },
+              "TimeoutSeconds": 300,
+              "End": true
+            }
+
+          }
         }
-      }],
+      ]
+    },
+
+    "Save to CSV": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "saveSpreadsheet",
+        "Payload": {
+          "history.$": "$.Payload.history"
+        }
+      },
+      "TimeoutSeconds": 300,
       "End": true
     }
 
