@@ -23,10 +23,8 @@ function getImages(history) {
 exports.handler = (event) => {
   const { history } = event;
   const images = getImages(history);
-  images.map((imageObj) =>
+  images.map(({ ts, files }) =>
     limit(async () => {
-      const { ts, files } = imageObj;
-      console.log(files);
       const analyzedFiles = await Promise.all(
         files.map(async (file) => {
           const { url_private: urlPrivate } = file;
@@ -44,19 +42,17 @@ exports.handler = (event) => {
         }),
       );
 
-      console.log('HERE', analyzedFiles, ts);
-      // const payload = {
-      //   TableName: 'messages',
-      //   Key: { ts: { S: ts } },
-      //   UpdateExpression: 'SET #SENTIMENT = :SENTIMENT',
-      //   ExpressionAttributeNames: { '#SENTIMENT': 'SENTIMENT' },
-      //   ExpressionAttributeValues: {
-      //     ':SENTIMENT': { S: JSON.stringify(resultList) },
-      //   },
-      // };
+      const payload = {
+        TableName: 'messages',
+        Key: { ts: { S: ts } },
+        UpdateExpression: 'SET #LABELS = :LABELS',
+        ExpressionAttributeNames: { '#LABELS': 'LABELS' },
+        ExpressionAttributeValues: {
+          ':LABELS': { S: JSON.stringify(analyzedFiles) },
+        },
+      };
 
-      console.log(dynamodb);
-      // return dynamodb.updateItem(payload).promise();
+      return dynamodb.updateItem(payload).promise();
     }),
   );
 };
