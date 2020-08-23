@@ -1,42 +1,63 @@
 const pLimit = require('p-limit');
 const fetch = require('node-fetch');
 
-const { Rekognition } = require('aws-sdk');
+const { DynamoDB, Rekognition } = require('aws-sdk');
 
 const { accessKeyId, secretAccessKey, region, botToken } = require('config');
+const c = require('config');
 
+const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
 const rekognition = new Rekognition({ region, accessKeyId, secretAccessKey });
 
 const limit = pLimit(10);
 
 function getImages(history) {
   return history.reduce((acc, curr) => {
-    const { files = [] } = JSON.parse(curr);
-    if (files.length) {
-      return [...acc, ...files];
-    }
-    return [...acc];
+    const { ts, files = [] } = JSON.parse(curr);
+
+    return [
+      ...acc,
+      ...files.map((file) => {
+        return { ts, file };
+      }),
+    ];
   }, []);
 }
 
 exports.handler = (event) => {
   const { history } = event;
   const images = getImages(history);
-  images.map((image) =>
-    limit(async () => {
-      const { url_private: urlPrivate } = image;
-      const buffer = await fetch(urlPrivate, {
-        headers: { Authorization: `Bearer ${botToken}` },
-      }).then((res) => res.buffer());
+  console.log(images);
+  images.map((imageObj) =>
+    limit(() => {
+      const { ts, files } = imageObj;
+      const analyzedFiles = files.map(async () => {
+        const { url_private: urlPrivate } = files;
+        const buffer = await fetch(urlPrivate, {
+          headers: { Authorization: `Bearer ${botToken}` },
+        }).then((res) => res.buffer());
 
-      const params = {
-        Image: {
-          Bytes: buffer,
-        },
-      };
+        const params = {
+          Image: {
+            Bytes: buffer,
+          },
+        };
 
-      const response = await rekognition.detectLabels(params).promise();
-      console.log(response);
+        return rekognition.detectLabels(params).promise();
+      });
+
+      console.log('HERE', analyzedFiles);
+      // const payload = {
+      //   TableName: 'messages',
+      //   Key: { ts: { S: ts } },
+      //   UpdateExpression: 'SET #SENTIMENT = :SENTIMENT',
+      //   ExpressionAttributeNames: { '#SENTIMENT': 'SENTIMENT' },
+      //   ExpressionAttributeValues: {
+      //     ':SENTIMENT': { S: JSON.stringify(resultList) },
+      //   },
+      // };
+
+      // return dynamodb.updateItem(payload).promise();
     }),
   );
 };
