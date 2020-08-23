@@ -24,23 +24,25 @@ exports.handler = (event) => {
   const { history } = event;
   const images = getImages(history);
   images.map((imageObj) =>
-    limit(() => {
+    limit(async () => {
       const { ts, files } = imageObj;
       console.log(files);
-      const analyzedFiles = await Promise.all(files.map(async (file) => {
-        const { url_private: urlPrivate } = file;
-        const buffer = await fetch(urlPrivate, {
-          headers: { Authorization: `Bearer ${botToken}` },
-        }).then((res) => res.buffer());
+      const analyzedFiles = await Promise.all(
+        files.map((file) => {
+          const { url_private: urlPrivate } = file;
+          const buffer = await fetch(urlPrivate, {
+            headers: { Authorization: `Bearer ${botToken}` },
+          }).then((res) => res.buffer());
 
-        const params = {
-          Image: {
-            Bytes: buffer,
-          },
-        };
+          const params = {
+            Image: {
+              Bytes: buffer,
+            },
+          };
 
-        return rekognition.detectLabels(params).promise();
-      }));
+          return rekognition.detectLabels(params).promise();
+        }),
+      );
 
       console.log('HERE', analyzedFiles, ts);
       // const payload = {
