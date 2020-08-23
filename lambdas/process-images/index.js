@@ -27,7 +27,7 @@ exports.handler = (event) => {
     limit(() => {
       const { ts, files } = imageObj;
       console.log(files);
-      const analyzedFiles = files.map(async (file) => {
+      const analyzedFiles = await Promise.all(files.map(async (file) => {
         const { url_private: urlPrivate } = file;
         const buffer = await fetch(urlPrivate, {
           headers: { Authorization: `Bearer ${botToken}` },
@@ -40,7 +40,7 @@ exports.handler = (event) => {
         };
 
         return rekognition.detectLabels(params).promise();
-      });
+      }));
 
       console.log('HERE', analyzedFiles, ts);
       // const payload = {
