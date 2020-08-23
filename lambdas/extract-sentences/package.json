@@ -9,7 +9,7 @@
   "scripts": {
     "build": "mkdir -p ../../tmp && zip -r ../../tmp/extract-sentences.zip lambda_function.py",
     "update": "aws lambda update-function-code --function extractSentences --zip-file fileb://../../tmp/extract-sentences.zip",
-    "lint": "echo \"TODO: lint Python\" || true",
+    "lint": "source ../../v-env/bin/activate && flake8 lambda_function.py && deactivate",
     "publish": "npm run lint &&  npm run build && npm run update"
   }
 }
