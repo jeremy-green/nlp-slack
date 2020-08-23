@@ -1,9 +1,7 @@
 exports.handler = async (event) => {
   const { history } = event;
-  console.log(history);
   const images = history.reduce((acc, curr) => {
-    const { files = [] } = curr;
-    console.log(files);
+    const { files = [] } = JSON.parse(curr);
     if (files.length) {
       return [...acc, ...files];
     }
