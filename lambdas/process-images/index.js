@@ -45,7 +45,7 @@ exports.handler = (event) => {
         return rekognition.detectLabels(params).promise();
       });
 
-      console.log('HERE', analyzedFiles);
+      console.log('HERE', analyzedFiles, ts);
       // const payload = {
       //   TableName: 'messages',
       //   Key: { ts: { S: ts } },
