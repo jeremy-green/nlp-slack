@@ -1,0 +1,6 @@
+{
+  "accessKeyId": "ACCESS_KEY_ID",
+  "botToken": "BOT_TOKEN",
+  "secretAccessKey": "SECRET_ACCESS_KEY",
+  "region": "AWS_REGION"
+}
