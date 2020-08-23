@@ -23,12 +23,12 @@ function getImages(history) {
 exports.handler = (event) => {
   const { history } = event;
   const images = getImages(history);
-  console.log(images);
   images.map((imageObj) =>
     limit(() => {
       const { ts, files } = imageObj;
-      const analyzedFiles = files.map(async () => {
-        const { url_private: urlPrivate } = files;
+      console.log(files);
+      const analyzedFiles = files.map(async (file) => {
+        const { url_private: urlPrivate } = file;
         const buffer = await fetch(urlPrivate, {
           headers: { Authorization: `Bearer ${botToken}` },
         }).then((res) => res.buffer());
