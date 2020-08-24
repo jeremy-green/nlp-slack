@@ -43,18 +43,10 @@ function mapDBProps(input) {
 
 function processHistory(item) {
   const parsed = JSON.parse(item);
-  const dynamicObj = Object.keys(parsed).reduce((acc, curr) => {
-    acc[curr] = {
-      S: typeof parsed[curr] === 'string' ? parsed[curr] : JSON.stringify(parsed[curr]),
-    };
-
-    return acc;
-  }, {});
-
   return dynamodb
     .putItem({
       TableName: 'messages',
-      Item: { ...mapDBProps(dynamicObj), __appid: { S: uuid() } },
+      Item: { ...mapDBProps(parsed), __appid: { S: uuid() } },
     })
     .promise();
 }
