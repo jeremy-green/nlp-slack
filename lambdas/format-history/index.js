@@ -8,6 +8,10 @@ const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
 
 const limit = pLimit(10);
 
+function generateDBObj(input) {
+  return Object.entries(input).reduce((acc, [key, val]) => ({ ...acc, [key]: mapDBProps(val) }), {});
+}
+
 function mapDBProps(input) {
   if (typeof input === 'boolean') {
     return { BOOL: input };
@@ -30,15 +34,14 @@ function mapDBProps(input) {
   }
 
   if (input instanceof Object) {
-    return Object.entries(input).reduce((acc, curr) => {
-      const [key, val] = curr;
-      acc[key] = mapDBProps(val);
-      console.log(key, typeof val, acc[key]);
-      return { ...acc };
-    }, {});
-  }
+    const obj = {};
+    Object.keys(input).forEach((key) => {
+      obj[key] = mapDBProps(input[key]);
+    });
+    console.log(obj);
 
-  return input;
+    return { M: obj };
+  }
 }
 
 function processHistory(item) {
@@ -46,7 +49,7 @@ function processHistory(item) {
   return dynamodb
     .putItem({
       TableName: 'messages',
-      Item: { ...mapDBProps(parsed), __appid: { S: uuid() } },
+      Item: { ...generateDBObj(parsed), __appid: { S: uuid() } },
     })
     .promise();
 }
