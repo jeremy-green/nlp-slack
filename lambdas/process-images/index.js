@@ -20,14 +20,11 @@ function getImages(history) {
   }, []);
 }
 
-exports.handler = (event) => {
-  const { history } = event;
-  const images = getImages(history);
-  images.map(({ ts, files }) =>
+exports.handler = ({ history }) =>
+  getImages(history).forEach(({ ts, files }) =>
     limit(async () => {
       const analyzedFiles = await Promise.all(
-        files.map(async (file) => {
-          const { url_private: urlPrivate } = file;
+        files.map(async ({ url_private: urlPrivate }) => {
           const buffer = await fetch(urlPrivate, {
             headers: { Authorization: `Bearer ${botToken}` },
           }).then((res) => res.buffer());
@@ -55,4 +52,3 @@ exports.handler = (event) => {
       return dynamodb.updateItem(payload).promise();
     }),
   );
-};
