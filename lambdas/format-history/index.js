@@ -8,10 +8,6 @@ const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
 
 const limit = pLimit(10);
 
-function generateDBObj(input) {
-  return Object.entries(input).reduce((acc, [key, val]) => ({ ...acc, [key]: mapDBProps(val) }), {});
-}
-
 function mapDBProps(input) {
   if (typeof input === 'boolean') {
     return { BOOL: input };
@@ -42,6 +38,12 @@ function mapDBProps(input) {
 
     return { M: obj };
   }
+
+  return input;
+}
+
+function generateDBObj(input) {
+  return Object.entries(input).reduce((acc, [key, val]) => ({ ...acc, [key]: mapDBProps(val) }), {});
 }
 
 function processHistory(item) {
