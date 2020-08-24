@@ -8,7 +8,7 @@ const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
 
 const limit = pLimit(10);
 
-function mapDynamoDBProps(input) {
+function mapDBProps(input) {
   if (typeof input === 'boolean') {
     return { BOOL: input };
   }
@@ -24,7 +24,7 @@ function mapDynamoDBProps(input) {
   if (input instanceof Array) {
     const tmp = [];
     for (let i = 0; i < input.length; i += 1) {
-      tmp.push(mapDynamoDBProps(input[i]));
+      tmp.push(mapDBProps(input[i]));
     }
     return { L: tmp };
   }
@@ -32,8 +32,9 @@ function mapDynamoDBProps(input) {
   if (input instanceof Object) {
     return Object.entries(input).reduce((acc, curr) => {
       const [key, val] = curr;
-      acc[key] = mapDynamoDBProps(val);
-      return { M: { ...acc } };
+      acc[key] = mapDBProps(val);
+      console.log(key, typeof val, acc[key]);
+      return { ...acc };
     }, {});
   }
 
@@ -50,12 +51,10 @@ function processHistory(item) {
     return acc;
   }, {});
 
-  console.log(JSON.stringify(mapDynamoDBProps(dynamicObj), null, 2));
-
   return dynamodb
     .putItem({
       TableName: 'messages',
-      Item: { ...mapDynamoDBProps(dynamicObj), __appid: { S: uuid() } },
+      Item: { ...mapDBProps(dynamicObj), __appid: { S: uuid() } },
     })
     .promise();
 }
