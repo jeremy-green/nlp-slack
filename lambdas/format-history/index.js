@@ -8,18 +8,49 @@ const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
 
 const limit = pLimit(10);
 
+function mapDynamoDBProps(input) {
+  if (typeof input === 'boolean') {
+    return { BOOL: input };
+  }
+
+  if (typeof input === 'string') {
+    return { S: input };
+  }
+
+  if (typeof input === 'number') {
+    return { N: input.toString() };
+  }
+
+  if (input instanceof Array) {
+    const tmp = [];
+    for (let i = 0; i < input.length; i += 1) {
+      tmp.push(mapDynamoDBProps(input[i]));
+    }
+    return { L: tmp };
+  }
+
+  if (input instanceof Object) {
+    return Object.entries(input).reduce((acc, curr) => {
+      const [key, val] = curr;
+      acc[key] = mapDynamoDBProps(val);
+      return { M: { ...acc } };
+    }, {});
+  }
+
+  return input;
+}
+
 function processHistory(item) {
   const parsed = JSON.parse(item);
   const dynamicObj = Object.keys(parsed).reduce((acc, curr) => {
     acc[curr] = {
-      S:
-        typeof parsed[curr] === 'string'
-          ? parsed[curr]
-          : JSON.stringify(parsed[curr]),
+      S: typeof parsed[curr] === 'string' ? parsed[curr] : JSON.stringify(parsed[curr]),
     };
 
     return acc;
   }, {});
+
+  console.log(mapDynamoDBProps(dynamicObj));
 
   return dynamodb
     .putItem({
