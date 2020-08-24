@@ -50,12 +50,12 @@ function processHistory(item) {
     return acc;
   }, {});
 
-  console.log(mapDynamoDBProps(dynamicObj));
+  console.log(JSON.stringify(mapDynamoDBProps(dynamicObj), null, 2));
 
   return dynamodb
     .putItem({
       TableName: 'messages',
-      Item: { ...dynamicObj, __appid: { S: uuid() } },
+      Item: { ...mapDynamoDBProps(dynamicObj), __appid: { S: uuid() } },
     })
     .promise();
 }
