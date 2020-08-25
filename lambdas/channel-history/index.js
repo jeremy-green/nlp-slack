@@ -36,9 +36,19 @@ const oldest = d.getTime() / 1000;
 const latest = Date.now() / 1000;
 
 const histories = [];
+
 function saveMessages(content) {
-  histories.push(JSON.stringify(content));
-  return Promise.resolve();
+  const key = `${prefix}/${Date.now()}.txt`;
+  const buffer = Buffer.from(histories.join(EOL));
+
+  const params = {
+    Bucket: bucket,
+    Key: key,
+    Body: buffer,
+    ContentType: 'text/plain',
+  };
+
+  return s3.putObject(params).promise();
 }
 
 async function getMessages(cursor) {
@@ -63,19 +73,5 @@ async function getMessages(cursor) {
 
 exports.handler = async () => {
   await getMessages();
-
-  const key = `${prefix}/${oldest}-${latest}.txt`;
-
-  const buffer = Buffer.from(histories.join(EOL));
-
-  const params = {
-    Bucket: bucket,
-    Key: key,
-    Body: buffer,
-    ContentType: 'text/plain',
-  };
-
-  await s3.putObject(params).promise();
-
   return { history: histories };
 };
