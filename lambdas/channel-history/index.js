@@ -1,5 +1,3 @@
-const { EOL } = require('os');
-
 const { S3 } = require('aws-sdk');
 const { WebClient } = require('@slack/web-api');
 
