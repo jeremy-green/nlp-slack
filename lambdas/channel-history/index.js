@@ -37,7 +37,7 @@ const latest = Date.now() / 1000;
 
 function saveMessages(content) {
   const key = `${prefix}/${Date.now()}.txt`;
-  const buffer = Buffer.from(content.join(EOL));
+  const buffer = Buffer.from(JSON.stringify(content));
 
   const params = {
     Bucket: bucket,
