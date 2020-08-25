@@ -20,7 +20,8 @@ function getImages(history) {
   }, []);
 }
 
-exports.handler = ({ history }) =>
+exports.handler = ({ history }) => {
+  console.log(history);
   getImages(history).forEach(({ ts, files }) =>
     limit(async () => {
       const analyzedFiles = await Promise.all(
@@ -34,7 +35,7 @@ exports.handler = ({ history }) =>
               Bytes: buffer,
             },
           };
-
+          console.log(params);
           return rekognition.detectLabels(params).promise();
         }),
       );
@@ -52,3 +53,4 @@ exports.handler = ({ history }) =>
       return dynamodb.updateItem(payload).promise();
     }),
   );
+};
