@@ -1,16 +1,15 @@
 {
   "Comment": "JEREMY RULES!!!",
-  "StartAt": "Get Channel History",
+  "StartAt": "Ignition",
   "States": {
 
-    "Get Channel History": {
+    "Ignition": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
-        "FunctionName": "getChannelHistory"
+        "FunctionName": "ignite"
       },
-      "Next": "Format Channel History",
-      "TimeoutSeconds": 600
+      "Next": "Format Channel History"
     },
 
     "Format Channel History": {
