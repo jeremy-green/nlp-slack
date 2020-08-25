@@ -35,11 +35,9 @@ d.setMilliseconds(0);
 const oldest = d.getTime() / 1000;
 const latest = Date.now() / 1000;
 
-const histories = [];
-
 function saveMessages(content) {
   const key = `${prefix}/${Date.now()}.txt`;
-  const buffer = Buffer.from(histories.join(EOL));
+  const buffer = Buffer.from(content.join(EOL));
 
   const params = {
     Bucket: bucket,
@@ -71,7 +69,4 @@ async function getMessages(cursor) {
   }
 }
 
-exports.handler = async () => {
-  await getMessages();
-  return { history: histories };
-};
+exports.handler = () => getMessages();

@@ -1,0 +1,6 @@
+{
+  "accessKeyId": "ACCESS_KEY_ID",
+  "secretAccessKey": "SECRET_ACCESS_KEY",
+  "region": "AWS_REGION",
+  "stateMachineArn": "STATE_MACHINE_ARN"
+}
