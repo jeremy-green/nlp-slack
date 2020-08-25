@@ -22,21 +22,11 @@ function mapDBProps(input) {
   }
 
   if (input instanceof Array) {
-    const tmp = [];
-    for (let i = 0; i < input.length; i += 1) {
-      tmp.push(mapDBProps(input[i]));
-    }
-    return { L: tmp };
+    return { L: input.map((item) => mapDBProps(item)) };
   }
 
   if (input instanceof Object) {
-    const obj = {};
-    Object.keys(input).forEach((key) => {
-      obj[key] = mapDBProps(input[key]);
-    });
-    console.log(obj);
-
-    return { M: obj };
+    return { M: Object.entries(input).reduce((acc, [key, val]) => ({ ...acc, [key]: mapDBProps(val) }), {}) };
   }
 
   return input;
