@@ -23,13 +23,12 @@ function getImages(history) {
 
 exports.handler = async (event) => {
   const { history } = event;
-  const r = await Promise.all(
+  await Promise.all(
     getImages(history).map(async ({ ts, files }) => {
       const analyzedFiles = await Promise.all(
         files
           .filter(({ filetype }) => ['png', 'jpg', 'gif'].includes(filetype))
           .map(async ({ url_private: urlPrivate }) => {
-            console.log(urlPrivate);
             const buffer = await fetch(urlPrivate, {
               headers: { Authorization: `Bearer ${botToken}` },
             }).then((res) => res.buffer());
@@ -58,6 +57,5 @@ exports.handler = async (event) => {
     }),
   );
 
-  console.log('DONE', r);
   return { history };
 };
