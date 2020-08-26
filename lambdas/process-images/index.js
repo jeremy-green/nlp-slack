@@ -8,7 +8,7 @@ const { accessKeyId, secretAccessKey, region, botToken } = require('config');
 const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
 const rekognition = new Rekognition({ region, accessKeyId, secretAccessKey });
 
-const limit = pLimit(5);
+const limit = pLimit(1);
 
 function getImages(history) {
   return history.reduce((acc, curr) => {
