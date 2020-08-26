@@ -9,6 +9,7 @@ max_length = 4500
 
 def lambda_handler(event, context):
     records = event["history"]
+    key = event["key"]
     messages = []
     for record in records:
         client_msg_id = record.get("client_msg_id")
@@ -27,4 +28,4 @@ def lambda_handler(event, context):
             msg = {"ts": ts, "sentences": filtered_sentences}
             messages.append(msg)
 
-    return {"history": messages}
+    return {"history": messages, "key": key}

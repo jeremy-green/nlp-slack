@@ -64,18 +64,18 @@ async function getMessages(cursor) {
 exports.handler = async () => {
   await getMessages();
 
-  const key = `${prefix}/${oldest}-${latest}.txt`;
+  const key = `${prefix}/${oldest}-${latest}`;
 
   const buffer = Buffer.from(histories.join(EOL));
 
   const params = {
     Bucket: bucket,
-    Key: key,
+    Key: `${key}.txt`,
     Body: buffer,
     ContentType: 'text/plain',
   };
 
   await s3.putObject(params).promise();
 
-  return { history: histories };
+  return { history: histories, key };
 };
