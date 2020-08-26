@@ -16,6 +16,8 @@ async function processHistory(item) {
     TextList: [...sentences, ...(sentences.length > 1 ? [sentences.join(' ')] : [])],
   };
 
+  await new Promise((resolve) => setTimeout(() => resolve(), 1000));
+
   const { ResultList: resultList } = await comprehend.batchDetectSentiment(params).promise();
 
   const payload = {
