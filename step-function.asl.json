@@ -1,91 +1,89 @@
 {
-  "Comment": "JEREMY RULES!!!",
-  "StartAt": "Format Channel History",
+  "StartAt": "Get Channel History",
   "States": {
-
-    "Format Channel History": {
+    "Get Channel History": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
-        "FunctionName": "formatHistory",
-        "Payload": {
-          "history.$": "$.Payload.history"
-        }
+        "FunctionName": "getChannelHistory"
       },
       "TimeoutSeconds": 300,
-      "Next": "Process Superfluous Info"
+      "Next": "Concurrent Lambdas"
     },
-
-    "Process Superfluous Info": {
-      "Type": "Parallel",
-      "Next": "Save to CSV",
-      "Branches": [
-        {
-          "StartAt": "Process Images",
-          "States": {
-
-            "Process Images": {
-              "Type": "Task",
-              "Resource": "arn:aws:states:::lambda:invoke",
-              "Parameters": {
-                "FunctionName": "processImages",
-                "Payload": {
-                  "history.$": "$.Payload.history"
-                }
-              },
-              "TimeoutSeconds": 300,
-              "End": true
-            }
-          }
-
-        },
-        {
-          "StartAt": "Extract Sentences",
-          "States": {
-
-            "Extract Sentences": {
-              "Type": "Task",
-              "Resource": "arn:aws:states:::lambda:invoke",
-              "Parameters": {
-                "FunctionName": "extractSentences",
-                "Payload": {
-                  "history.$": "$.Payload.history"
-                }
-              },
-              "TimeoutSeconds": 300,
-              "Next": "Process Sentiment"
+    "Concurrent Lambdas": {
+      "Type": "Map",
+      "MaxConcurrency": 1,
+      "ItemsPath": "$.Payload.history",
+      "Iterator": {
+        "StartAt": "Format Channel History",
+        "States": {
+          "Format Channel History": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Parameters": {
+              "FunctionName": "formatHistory",
+              "Payload": {
+                "history.$": "$"
+              }
             },
-
-            "Process Sentiment": {
-              "Type": "Task",
-              "Resource": "arn:aws:states:::lambda:invoke",
-              "Parameters": {
-                "FunctionName": "getSentiment",
-                "Payload": {
-                  "history.$": "$.Payload.history"
+            "TimeoutSeconds": 300,
+            "Next": "Process Superfluous Info"
+          },
+          "Process Superfluous Info": {
+            "Type": "Parallel",
+            "End": true,
+            "Branches": [
+              {
+                "StartAt": "Process Images",
+                "States": {
+                  "Process Images": {
+                    "Type": "Task",
+                    "Resource": "arn:aws:states:::lambda:invoke",
+                    "Parameters": {
+                      "FunctionName": "processImages",
+                      "Payload": {
+                        "history.$": "$.Payload.history"
+                      }
+                    },
+                    "TimeoutSeconds": 300,
+                    "End": true
+                  }
                 }
               },
-              "TimeoutSeconds": 300,
-              "End": true
-            }
-
+              {
+                "StartAt": "Extract Sentences",
+                "States": {
+                  "Extract Sentences": {
+                    "Type": "Task",
+                    "Resource": "arn:aws:states:::lambda:invoke",
+                    "Parameters": {
+                      "FunctionName": "extractSentences",
+                      "Payload": {
+                        "history.$": "$.Payload.history"
+                      }
+                    },
+                    "TimeoutSeconds": 300,
+                    "Next": "Process Sentiment"
+                  },
+                  "Process Sentiment": {
+                    "Type": "Task",
+                    "Resource": "arn:aws:states:::lambda:invoke",
+                    "Parameters": {
+                      "FunctionName": "getSentiment",
+                      "Payload": {
+                        "history.$": "$.Payload.history"
+                      }
+                    },
+                    "TimeoutSeconds": 300,
+                    "End": true
+                  }
+                }
+              }
+            ]
           }
         }
-      ]
-    },
-
-    "Save to CSV": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::lambda:invoke",
-      "Parameters": {
-        "FunctionName": "saveSpreadsheet",
-        "Payload": {
-          "history.$": "$.Payload.history"
-        }
       },
-      "TimeoutSeconds": 300,
       "End": true
     }
-
   }
 }
