@@ -22,37 +22,42 @@ function getImages(history) {
 }
 
 exports.handler = ({ history }) => {
-  getImages(history)
-    .filter(({ filetype }) => ['png', 'jpg', 'gif'].includes(filetype))
-    .forEach(({ ts, files }) =>
-      limit(async () => {
-        const analyzedFiles = await Promise.all(
-          files.map(async ({ url_private: urlPrivate }) => {
-            const buffer = await fetch(urlPrivate, {
-              headers: { Authorization: `Bearer ${botToken}` },
-            }).then((res) => res.buffer());
+  Promise.all(
+    getImages(history)
+      .filter(({ filetype }) => ['png', 'jpg', 'gif'].includes(filetype))
+      .map(({ ts, files }) =>
+        limit(async () => {
+          const analyzedFiles = await Promise.all(
+            files.map(async ({ url_private: urlPrivate }) => {
+              console.log(urlPrivate);
+              const buffer = await fetch(urlPrivate, {
+                headers: { Authorization: `Bearer ${botToken}` },
+              }).then((res) => res.buffer());
 
-            const params = {
-              Image: {
-                Bytes: buffer,
-              },
-            };
+              const params = {
+                Image: {
+                  Bytes: buffer,
+                },
+              };
 
-            return rekognition.detectLabels(params).promise();
-          }),
-        );
+              console.log(params);
+              return rekognition.detectLabels(params).promise();
+            }),
+          );
 
-        const payload = {
-          TableName: 'messages',
-          Key: { ts: { S: ts } },
-          UpdateExpression: 'SET #LABELS = :LABELS',
-          ExpressionAttributeNames: { '#LABELS': 'LABELS' },
-          ExpressionAttributeValues: {
-            ':LABELS': { M: generateDBObj(analyzedFiles) },
-          },
-        };
+          const payload = {
+            TableName: 'messages',
+            Key: { ts: { S: ts } },
+            UpdateExpression: 'SET #LABELS = :LABELS',
+            ExpressionAttributeNames: { '#LABELS': 'LABELS' },
+            ExpressionAttributeValues: {
+              ':LABELS': { M: generateDBObj(analyzedFiles) },
+            },
+          };
+          console.log(payload);
 
-        return dynamodb.updateItem(payload).promise();
-      }),
-    );
+          return dynamodb.updateItem(payload).promise();
+        }),
+      ),
+  );
 };
