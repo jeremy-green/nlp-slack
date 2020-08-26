@@ -27,10 +27,7 @@ exports.handler = async (event) => {
     getImages(history).map(async ({ ts, files }) => {
       const analyzedFiles = await Promise.all(
         files
-          .filter(({ filetype }) => {
-            console.log(filetype, ['png', 'jpg', 'gif'].includes(filetype));
-            return ['png', 'jpg', 'gif'].includes(filetype);
-          })
+          .filter(({ filetype }) => ['png', 'jpg', 'gif'].includes(filetype))
           .map(async ({ url_private: urlPrivate }) => {
             console.log(urlPrivate);
             const buffer = await fetch(urlPrivate, {
@@ -43,7 +40,6 @@ exports.handler = async (event) => {
               },
             };
 
-            console.log(params);
             return rekognition.detectLabels(params).promise();
           }),
       );
