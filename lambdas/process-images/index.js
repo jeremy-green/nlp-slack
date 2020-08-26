@@ -23,15 +23,15 @@ function getImages(history) {
 
 exports.handler = ({ history }) => {
   Promise.all(
-    getImages(history)
-      .filter(({ filetype }) => {
-        console.log(filetype, ['png', 'jpg', 'gif'].includes(filetype));
-        return ['png', 'jpg', 'gif'].includes(filetype);
-      })
-      .map(({ ts, files }) =>
-        limit(async () => {
-          const analyzedFiles = await Promise.all(
-            files.map(async ({ url_private: urlPrivate }) => {
+    getImages(history).map(({ ts, files }) =>
+      limit(async () => {
+        const analyzedFiles = await Promise.all(
+          files
+            .filter(({ filetype }) => {
+              console.log(filetype, ['png', 'jpg', 'gif'].includes(filetype));
+              return ['png', 'jpg', 'gif'].includes(filetype);
+            })
+            .map(async ({ url_private: urlPrivate }) => {
               console.log(urlPrivate);
               const buffer = await fetch(urlPrivate, {
                 headers: { Authorization: `Bearer ${botToken}` },
@@ -46,21 +46,21 @@ exports.handler = ({ history }) => {
               console.log(params);
               return rekognition.detectLabels(params).promise();
             }),
-          );
+        );
 
-          const payload = {
-            TableName: 'messages',
-            Key: { ts: { S: ts } },
-            UpdateExpression: 'SET #LABELS = :LABELS',
-            ExpressionAttributeNames: { '#LABELS': 'LABELS' },
-            ExpressionAttributeValues: {
-              ':LABELS': { M: generateDBObj(analyzedFiles) },
-            },
-          };
-          console.log(payload);
+        const payload = {
+          TableName: 'messages',
+          Key: { ts: { S: ts } },
+          UpdateExpression: 'SET #LABELS = :LABELS',
+          ExpressionAttributeNames: { '#LABELS': 'LABELS' },
+          ExpressionAttributeValues: {
+            ':LABELS': { M: generateDBObj(analyzedFiles) },
+          },
+        };
+        console.log(payload);
 
-          return dynamodb.updateItem(payload).promise();
-        }),
-      ),
+        return dynamodb.updateItem(payload).promise();
+      }),
+    ),
   );
 };
