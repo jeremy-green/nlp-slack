@@ -10,29 +10,23 @@ const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
 const limit = pLimit(10);
 
 function processHistory(item) {
-  const parsed = JSON.parse(item);
+  // console.log(item);
+  // const parsed = JSON.parse(item);
   return dynamodb
     .putItem({
       TableName: 'messages',
-      Item: { ...generateDBObj(parsed), __appid: { S: uuid() } },
+      Item: { ...generateDBObj(item), __appid: { S: uuid() } },
     })
     .promise();
 }
 
 exports.handler = async (event) => {
   const { history } = event;
-
-  const allMessages = history
-    .reduce((acc, curr) => {
-      const { messages } = JSON.parse(curr);
-      const tmp = messages.map((message) => JSON.stringify(message));
-      return [...acc, ...tmp];
-    }, [])
-    .reverse();
-
-  const input = allMessages.map((item) => limit(() => processHistory(item)));
+  const { messages } = JSON.parse(history);
+  console.log(messages);
+  const input = messages.map((item) => limit(() => processHistory(item)));
 
   await Promise.all(input);
 
-  return { history: allMessages };
+  return { history: messages };
 };
