@@ -1,5 +1,3 @@
-const pLimit = require('p-limit');
-
 const { Comprehend, DynamoDB } = require('aws-sdk');
 const { accessKeyId, secretAccessKey, region = 'us-east-1' } = require('config');
 const { generateDBObj } = require('@nlp-slack/helpers');
@@ -7,13 +5,11 @@ const { generateDBObj } = require('@nlp-slack/helpers');
 const comprehend = new Comprehend({ region, accessKeyId, secretAccessKey });
 const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
 
-const limit = pLimit(1);
-
 async function processHistory(item) {
   const { ts, sentences } = item;
   const params = {
     LanguageCode: 'en',
-    TextList: [...sentences, ...(sentences.length > 1 ? [sentences.join(' ')] : [])],
+    TextList: sentences,
   };
 
   await new Promise((resolve) => setTimeout(() => resolve(), 1000));
@@ -33,4 +29,4 @@ async function processHistory(item) {
   return dynamodb.updateItem(payload).promise();
 }
 
-exports.handler = ({ history }) => Promise.all(history.map((item) => limit(() => processHistory(item))));
+exports.handler = ({ history }) => Promise.all(history.map((item) => processHistory(item)));
