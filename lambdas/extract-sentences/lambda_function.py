@@ -12,10 +12,9 @@ def lambda_handler(event, context):
     records = event["history"]
     messages = []
     for record in records:
-        parsed_message = json.loads(record)
-        client_msg_id = parsed_message.get("client_msg_id")
-        ts = parsed_message.get("ts")
-        tokenized_sentences = nltk.sent_tokenize(parsed_message["text"])
+        client_msg_id = record.get("client_msg_id")
+        ts = record.get("ts")
+        tokenized_sentences = nltk.sent_tokenize(record["text"])
         filtered_sentences = list(
             set(
                 [
