@@ -20,7 +20,6 @@ const s3 = new S3({ region, accessKeyId, secretAccessKey, endpoint });
 const d = new Date();
 
 if (fullHistory === 'true') {
-  console.log('HERE');
   d.setFullYear(2020);
   d.setMonth(0);
   d.setDate(1);

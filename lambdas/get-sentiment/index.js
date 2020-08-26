@@ -10,7 +10,6 @@ const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
 const limit = pLimit(1);
 
 async function processHistory(item) {
-  console.log('HERE');
   const { ts, sentences } = item;
   const params = {
     LanguageCode: 'en',
