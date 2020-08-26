@@ -21,8 +21,8 @@ function getImages(history) {
   }, []);
 }
 
-exports.handler = ({ history }) =>
-  Promise.all(
+exports.handler = async ({ history }) => {
+  await Promise.all(
     getImages(history).map(({ ts, files }) =>
       limit(async () => {
         const analyzedFiles = await Promise.all(
@@ -63,3 +63,6 @@ exports.handler = ({ history }) =>
       }),
     ),
   );
+  console.log('DONE');
+  return { history };
+};
