@@ -39,6 +39,8 @@ exports.handler = async (event) => {
               },
             };
 
+            await new Promise((resolve) => setTimeout(() => resolve(), 1000));
+
             return rekognition.detectLabels(params).promise();
           }),
       );
