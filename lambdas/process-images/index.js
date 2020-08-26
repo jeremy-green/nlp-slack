@@ -21,8 +21,9 @@ function getImages(history) {
   }, []);
 }
 
-exports.handler = async ({ history }) => {
-  console.log(history);
+exports.handler = async (event) => {
+  const { history } = event;
+  console.log(history, event);
   const r = await Promise.all(
     getImages(history).map(async ({ ts, files }) => {
       const analyzedFiles = await Promise.all(
@@ -57,11 +58,14 @@ exports.handler = async ({ history }) => {
           ':LABELS': { M: generateDBObj(analyzedFiles) },
         },
       };
+
       console.log(payload);
 
-      return dynamodb.updateItem(payload).promise();
+      const update = await dynamodb.updateItem(payload).promise();
+      return update;
     }),
   );
+
   console.log('DONE', r);
   return { history };
 };
