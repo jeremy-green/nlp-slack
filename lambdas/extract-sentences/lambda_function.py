@@ -1,4 +1,3 @@
-import json
 import nltk
 
 nltk.data.path.append("/tmp")
