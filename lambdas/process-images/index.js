@@ -21,7 +21,7 @@ function getImages(history) {
   }, []);
 }
 
-exports.handler = ({ history }) => {
+exports.handler = ({ history }) =>
   Promise.all(
     getImages(history).map(({ ts, files }) =>
       limit(async () => {
@@ -63,4 +63,3 @@ exports.handler = ({ history }) => {
       }),
     ),
   );
-};
