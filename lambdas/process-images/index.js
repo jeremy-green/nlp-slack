@@ -4,6 +4,7 @@ const fetch = require('node-fetch');
 const { DynamoDB, Rekognition } = require('aws-sdk');
 
 const { accessKeyId, secretAccessKey, region, botToken } = require('config');
+const { generateDBObj } = require('@nlp-slack/helpers');
 
 const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
 const rekognition = new Rekognition({ region, accessKeyId, secretAccessKey });
@@ -48,7 +49,7 @@ exports.handler = ({ history }) => {
           UpdateExpression: 'SET #LABELS = :LABELS',
           ExpressionAttributeNames: { '#LABELS': 'LABELS' },
           ExpressionAttributeValues: {
-            ':LABELS': { S: JSON.stringify(analyzedFiles) },
+            ':LABELS': { M: generateDBObj(analyzedFiles) },
           },
         };
 
