@@ -10,8 +10,6 @@ const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
 const limit = pLimit(10);
 
 function processHistory(item) {
-  // console.log(item);
-  // const parsed = JSON.parse(item);
   return dynamodb
     .putItem({
       TableName: 'messages',
@@ -20,12 +18,9 @@ function processHistory(item) {
     .promise();
 }
 
-exports.handler = async (event) => {
-  const { history } = event;
+exports.handler = async ({ history }) => {
   const { messages } = JSON.parse(history);
-  console.log(messages);
   const input = messages.map((item) => limit(() => processHistory(item)));
-
   await Promise.all(input);
 
   return { history: messages };
