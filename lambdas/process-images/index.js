@@ -1,15 +1,12 @@
-// const pLimit = require('p-limit');
 const fetch = require('node-fetch');
 
 const { DynamoDB, Rekognition } = require('aws-sdk');
-
 const { accessKeyId, secretAccessKey, region, botToken } = require('config');
 const { generateDBObj } = require('@nlp-slack/helpers');
 
 const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
 const rekognition = new Rekognition({ region, accessKeyId, secretAccessKey });
 
-// const limit = pLimit(1);
 const SUPPORTED_IMAGES = ['png', 'jpg', 'gif'];
 
 function getImages(history) {
@@ -23,7 +20,6 @@ function getImages(history) {
 }
 
 async function processImages({ url_private: urlPrivate }) {
-  console.log(urlPrivate);
   const buffer = await fetch(urlPrivate, {
     headers: { Authorization: `Bearer ${botToken}` },
   }).then((res) => res.buffer());
@@ -56,12 +52,4 @@ async function handleImage({ ts, files }) {
   return dynamodb.updateItem(payload).promise();
 }
 
-exports.handler = async (event) => {
-  const { history } = event;
-  console.log(history);
-  const images = getImages(history);
-  console.log(images);
-  const r = await Promise.all(images.map(handleImage));
-  console.log('DONE', r);
-  return { history };
-};
+exports.handler = async ({ history }) => Promise.all(getImages(history).map(handleImage));
