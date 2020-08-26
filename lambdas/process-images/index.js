@@ -23,12 +23,13 @@ function getImages(history) {
 
 exports.handler = async (event) => {
   const { history } = event;
-  await Promise.all(
+  const r = await Promise.all(
     getImages(history).map(async ({ ts, files }) => {
       const analyzedFiles = await Promise.all(
         files
           .filter(({ filetype }) => ['png', 'jpg', 'gif'].includes(filetype))
           .map(async ({ url_private: urlPrivate }) => {
+            console.log(urlPrivate);
             const buffer = await fetch(urlPrivate, {
               headers: { Authorization: `Bearer ${botToken}` },
             }).then((res) => res.buffer());
@@ -39,7 +40,9 @@ exports.handler = async (event) => {
               },
             };
 
-            await new Promise((resolve) => setTimeout(() => resolve(), 1000));
+            console.log('about to sleep');
+            await new Promise((resolve) => setTimeout(() => console.log('sleeping') || resolve(), 1000));
+            console.log('lets roll');
 
             return rekognition.detectLabels(params).promise();
           }),
@@ -59,5 +62,6 @@ exports.handler = async (event) => {
     }),
   );
 
+  console.log('DONE', r);
   return { history };
 };
