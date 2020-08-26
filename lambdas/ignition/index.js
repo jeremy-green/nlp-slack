@@ -31,6 +31,5 @@ exports.handler = async (event) => {
     name: uuid(),
   };
 
-  const r = await stepfunctions.startExecution(params).promise();
-  console.log(r);
+  return stepfunctions.startExecution(params).promise();
 };
