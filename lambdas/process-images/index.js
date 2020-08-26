@@ -10,6 +10,7 @@ const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
 const rekognition = new Rekognition({ region, accessKeyId, secretAccessKey });
 
 // const limit = pLimit(1);
+const SUPPORTED_IMAGES = ['png', 'jpg', 'gif'];
 
 function getImages(history) {
   return history.reduce((acc, curr) => {
@@ -21,47 +22,46 @@ function getImages(history) {
   }, []);
 }
 
-exports.handler = async (event) => {
-  const { history } = event;
-  const r = await Promise.all(
-    getImages(history).map(async ({ ts, files }) => {
-      const analyzedFiles = await Promise.all(
-        files
-          .filter(({ filetype }) => ['png', 'jpg', 'gif'].includes(filetype))
-          .map(async ({ url_private: urlPrivate }) => {
-            console.log(urlPrivate);
-            const buffer = await fetch(urlPrivate, {
-              headers: { Authorization: `Bearer ${botToken}` },
-            }).then((res) => res.buffer());
+async function processImages({ url_private: urlPrivate }) {
+  console.log(urlPrivate);
+  const buffer = await fetch(urlPrivate, {
+    headers: { Authorization: `Bearer ${botToken}` },
+  }).then((res) => res.buffer());
 
-            const params = {
-              Image: {
-                Bytes: buffer,
-              },
-            };
+  const params = {
+    Image: {
+      Bytes: buffer,
+    },
+  };
 
-            console.log('about to sleep');
-            await new Promise((resolve) => setTimeout(() => console.log('sleeping') || resolve(), 1000));
-            console.log('lets roll');
+  await new Promise((resolve) => setTimeout(() => resolve(), 1000));
+  return rekognition.detectLabels(params).promise();
+}
 
-            return rekognition.detectLabels(params).promise();
-          }),
-      );
-
-      const payload = {
-        TableName: 'messages',
-        Key: { ts: { S: ts } },
-        UpdateExpression: 'SET #LABELS = :LABELS',
-        ExpressionAttributeNames: { '#LABELS': 'LABELS' },
-        ExpressionAttributeValues: {
-          ':LABELS': { M: generateDBObj(analyzedFiles) },
-        },
-      };
-
-      return dynamodb.updateItem(payload).promise();
-    }),
+async function handleImage({ ts, files }) {
+  const analyzedFiles = await Promise.all(
+    files.filter(({ filetype }) => SUPPORTED_IMAGES.includes(filetype)).map(processImages),
   );
 
+  const payload = {
+    TableName: 'messages',
+    Key: { ts: { S: ts } },
+    UpdateExpression: 'SET #LABELS = :LABELS',
+    ExpressionAttributeNames: { '#LABELS': 'LABELS' },
+    ExpressionAttributeValues: {
+      ':LABELS': { M: generateDBObj(analyzedFiles) },
+    },
+  };
+
+  return dynamodb.updateItem(payload).promise();
+}
+
+exports.handler = async (event) => {
+  const { history } = event;
+  console.log(history);
+  const images = getImages(history);
+  console.log(images);
+  const r = await Promise.all(images.map(handleImage));
   console.log('DONE', r);
   return { history };
 };
