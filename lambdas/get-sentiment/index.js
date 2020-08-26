@@ -7,7 +7,7 @@ const { generateDBObj } = require('@nlp-slack/helpers');
 const comprehend = new Comprehend({ region, accessKeyId, secretAccessKey });
 const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
 
-const limit = pLimit(5);
+const limit = pLimit(1);
 
 async function processHistory(item) {
   const { ts, sentences } = item;
