@@ -24,7 +24,10 @@ function getImages(history) {
 exports.handler = ({ history }) => {
   Promise.all(
     getImages(history)
-      .filter(({ filetype }) => ['png', 'jpg', 'gif'].includes(filetype))
+      .filter(({ filetype }) => {
+        console.log(filetype, ['png', 'jpg', 'gif'].includes(filetype));
+        return ['png', 'jpg', 'gif'].includes(filetype);
+      })
       .map(({ ts, files }) =>
         limit(async () => {
           const analyzedFiles = await Promise.all(
