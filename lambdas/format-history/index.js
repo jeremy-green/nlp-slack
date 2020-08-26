@@ -18,7 +18,10 @@ function processHistory(item) {
     .promise();
 }
 
-exports.handler = async ({ history, key }) => {
+exports.handler = async (event) => {
+  console.log(event);
+  const key = '';
+  const { history } = event;
   const { messages } = JSON.parse(history);
   const input = messages.map((item) => limit(() => processHistory(item)));
   await Promise.all(input);
