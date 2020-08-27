@@ -71,7 +71,7 @@ exports.handler = async ({ key, bucket }) => {
   const params = { Key: key, Bucket: bucket };
   const data = await s3.getObject(params).promise();
   const messages = data.Body.toString('utf-8');
-  console.log(messages);
+  console.log(typeof messages);
 
   return Promise.all(getImages(messages).map(handleImage));
 };
