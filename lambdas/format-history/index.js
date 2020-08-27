@@ -4,13 +4,14 @@ const pLimit = require('p-limit');
 const { DynamoDB, S3 } = require('aws-sdk');
 const { v4: uuid } = require('uuid');
 const { accessKeyId, secretAccessKey, region, prefix, bucket } = require('config');
-console.log('HERE', prefix, bucket);
 const { generateDBObj } = require('@nlp-slack/helpers');
 
 const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
 const s3 = new S3({ region, accessKeyId, secretAccessKey });
 
 const limit = pLimit(10);
+
+console.log('HERE', prefix, bucket);
 
 function processHistory(item) {
   return dynamodb
