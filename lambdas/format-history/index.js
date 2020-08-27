@@ -21,6 +21,7 @@ function processHistory(item) {
 }
 
 exports.handler = async ({ bucket: Bucket, key, format }) => {
+  console.log(bucket, Bucket);
   const getObjectParams = {
     Key: `${key}.${format}`,
     Bucket,
