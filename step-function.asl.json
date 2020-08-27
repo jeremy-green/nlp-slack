@@ -23,7 +23,7 @@
             "Parameters": {
               "FunctionName": "formatHistory",
               "Payload": {
-                "history.$": "$"
+                "$": "$"
               }
             },
             "TimeoutSeconds": 300,
