@@ -33,6 +33,10 @@
 exports.handler = (event) => {
   console.log(event);
   const { results } = event;
-  const thing = results.find((result) => result.Payload.object);
+  console.log(results);
+  const thing = results.find((result) => {
+    console.log(result);
+    result.Payload.object !== undefined;
+  });
   console.log('HERE', thing);
 };
