@@ -1,37 +1,50 @@
-// const { EOL } = require('os');
-// const pLimit = require('p-limit');
+const { EOL } = require('os');
+const pLimit = require('p-limit');
 
-// const { DynamoDB } = require('aws-sdk');
-// const { v4: uuid } = require('uuid');
-// const { accessKeyId, secretAccessKey, region } = require('config');
-// const { generateDBObj } = require('@nlp-slack/helpers');
+const { DynamoDB, S3 } = require('aws-sdk');
+const { v4: uuid } = require('uuid');
+const { accessKeyId, secretAccessKey, region, bucket } = require('config');
+const { generateDBObj } = require('@nlp-slack/helpers');
 
-// const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
-// const s3 = new S3({ region, accessKeyId, secretAccessKey });
+const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
+const s3 = new S3({ region, accessKeyId, secretAccessKey });
 
-// const limit = pLimit(10);
+const limit = pLimit(10);
 
-// function processHistory(item) {
-//   return dynamodb
-//     .putItem({
-//       TableName: 'messages',
-//       Item: { ...generateDBObj(item), __appid: { S: uuid() } },
-//     })
-//     .promise();
-// }
+function processHistory(item) {
+  return dynamodb
+    .putItem({
+      TableName: 'messages',
+      Item: { ...generateDBObj(item), __appid: { S: uuid() } },
+    })
+    .promise();
+}
 
-exports.handler = async (event) => {
-  console.log(event);
+async function createObject(item) {
+  const buffer = Buffer.from(JSON.stringify(message));
+  const Key = `${key}/${Date.now()}.${format}`;
+  const putObjectParams = {
+    Body: buffer,
+    Bucket: bucket,
+    Key,
+  };
+  console.log(putObjectParams);
+  await s3.putObject(putObjectParams).promise();
+  return { bucket, key: Key, arn: `arn:aws:s3:::${bucket}/${key}.${format}` };
+}
 
-  // const data = await s3.getObject(params).promise();
-  // const payload = data.Body.toString('utf-8').split(EOL);
+exports.handler = async ({ bucket: Bucket, key, format }) => {
+  const getObjectParams = {
+    Key: `${key}.${format}`,
+    Bucket,
+  };
 
-  // /** nope... */
-  // const { history } = event;
-  // const { messages } = JSON.parse(history);
+  const data = await s3.getObject(getObjectParams).promise();
+  const payload = data.Body.toString('utf-8').split(EOL);
+  const { messages } = JSON.parse(payload);
 
-  // const input = messages.map((item) => limit(() => processHistory(item)));
-  // await Promise.all(input);
+  await Promise.all(messages.map((message) => limit(() => processHistory(message))));
+  const arns = await Promise.all(messages.map((message) => limit(() => createObject(message))));
 
-  // return { history: messages, key };
+  return arns;
 };

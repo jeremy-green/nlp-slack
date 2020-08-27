@@ -1,7 +1,6 @@
 {
   "accessKeyId": "ACCESS_KEY_ID",
   "bucket": "S3_BUCKET",
-  "prefix": "S3_PREFIX",
   "secretAccessKey": "SECRET_ACCESS_KEY",
   "region": "AWS_REGION"
 }

@@ -13,11 +13,7 @@
     "Concurrent Lambdas": {
       "Type": "Map",
       "MaxConcurrency": 1,
-      "ItemsPath": "$.Payload.history",
-      "Parameters": {
-        "history.$": "$$.Map.Item.Value",
-        "key.$": "$.Payload.key"
-      },
+      "ItemsPath": "$.Payload",
       "Iterator": {
         "StartAt": "Format Channel History",
         "States": {
