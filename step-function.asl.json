@@ -26,6 +26,7 @@
                 "bucket.$": "$.bucket",
                 "key.$": "$.key",
                 "format.$": "$.format",
+                "range.$": "$.range",
                 "arn.$": "$.arn"
               }
             },
