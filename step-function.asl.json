@@ -62,6 +62,18 @@
           }
         }
       },
+      "Next": "Process Sentiment"
+    },
+    "Process Sentiment": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "getSentiment",
+        "Payload": {
+          "history.$": "$.Payload.history"
+        }
+      },
+      "TimeoutSeconds": 300,
       "End": true
     }
   }

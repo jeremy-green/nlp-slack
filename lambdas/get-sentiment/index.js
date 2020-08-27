@@ -1,32 +1,35 @@
-const { Comprehend, DynamoDB } = require('aws-sdk');
-const { accessKeyId, secretAccessKey, region = 'us-east-1' } = require('config');
-const { generateDBObj } = require('@nlp-slack/helpers');
+// const { Comprehend, DynamoDB } = require('aws-sdk');
+// const { accessKeyId, secretAccessKey, region = 'us-east-1' } = require('config');
+// const { generateDBObj } = require('@nlp-slack/helpers');
 
-const comprehend = new Comprehend({ region, accessKeyId, secretAccessKey });
-const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
+// const comprehend = new Comprehend({ region, accessKeyId, secretAccessKey });
+// const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
 
-async function processHistory(item) {
-  const { ts, sentences } = item;
-  const params = {
-    LanguageCode: 'en',
-    TextList: sentences,
-  };
+// async function processHistory(item) {
+//   const { ts, sentences } = item;
+//   const params = {
+//     LanguageCode: 'en',
+//     TextList: sentences,
+//   };
 
-  await new Promise((resolve) => setTimeout(() => resolve(), 1000));
+//   await new Promise((resolve) => setTimeout(() => resolve(), 1000));
 
-  const { ResultList: resultList } = await comprehend.batchDetectSentiment(params).promise();
+//   const { ResultList: resultList } = await comprehend.batchDetectSentiment(params).promise();
 
-  const payload = {
-    TableName: 'messages',
-    Key: { ts: { S: ts } },
-    UpdateExpression: 'SET #SENTIMENT = :SENTIMENT',
-    ExpressionAttributeNames: { '#SENTIMENT': 'SENTIMENT' },
-    ExpressionAttributeValues: {
-      ':SENTIMENT': { M: generateDBObj(resultList) },
-    },
-  };
+//   const payload = {
+//     TableName: 'messages',
+//     Key: { ts: { S: ts } },
+//     UpdateExpression: 'SET #SENTIMENT = :SENTIMENT',
+//     ExpressionAttributeNames: { '#SENTIMENT': 'SENTIMENT' },
+//     ExpressionAttributeValues: {
+//       ':SENTIMENT': { M: generateDBObj(resultList) },
+//     },
+//   };
 
-  return dynamodb.updateItem(payload).promise();
-}
+//   return dynamodb.updateItem(payload).promise();
+// }
 
-exports.handler = ({ history }) => Promise.all(history.map((item) => processHistory(item)));
+// exports.handler = ({ history }) => Promise.all(history.map((item) => processHistory(item)));
+exports.handler = (event) => {
+  console.log(event);
+};
