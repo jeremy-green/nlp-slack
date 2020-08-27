@@ -77,5 +77,5 @@ async function getMessages(cursor) {
 exports.handler = async () => {
   await getMessages();
 
-  return arns;
+  return { arns };
 };

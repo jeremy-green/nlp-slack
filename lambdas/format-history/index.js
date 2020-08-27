@@ -3,7 +3,8 @@ const pLimit = require('p-limit');
 
 const { DynamoDB, S3 } = require('aws-sdk');
 const { v4: uuid } = require('uuid');
-const { accessKeyId, secretAccessKey, region, bucket } = require('config');
+const { accessKeyId, secretAccessKey, region, prefix, bucket } = require('config');
+console.log('HERE', prefix, bucket);
 const { generateDBObj } = require('@nlp-slack/helpers');
 
 const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
@@ -21,7 +22,6 @@ function processHistory(item) {
 }
 
 exports.handler = async (event) => {
-  console.log(event);
   const { key, format, bucket: Bucket } = event;
   const getObjectParams = {
     Key: `${key}.${format}`,
@@ -36,8 +36,9 @@ exports.handler = async (event) => {
   const arns = await Promise.all(
     messages.map((message) =>
       limit(async () => {
+        console.log(bucket, prefix);
         const buffer = Buffer.from(JSON.stringify(message));
-        const Key = `${key}/${Date.now()}.${format}`;
+        const Key = `${prefix}/${Date.now()}.${format}`;
         const putObjectParams = {
           Body: buffer,
           Bucket: bucket,
@@ -50,5 +51,5 @@ exports.handler = async (event) => {
     ),
   );
 
-  return arns;
+  return { arns };
 };

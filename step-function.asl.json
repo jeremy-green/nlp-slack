@@ -13,7 +13,7 @@
     "Concurrent Lambdas": {
       "Type": "Map",
       "MaxConcurrency": 1,
-      "ItemsPath": "$.Payload",
+      "ItemsPath": "$.Payload.arns",
       "Iterator": {
         "StartAt": "Format Channel History",
         "States": {
@@ -23,7 +23,10 @@
             "Parameters": {
               "FunctionName": "formatHistory",
               "Payload": {
-                "$": "$"
+                "bucket.$": "$.bucket",
+                "key.$": "$.key",
+                "format.$": "$.format",
+                "arn.$": "$.arn"
               }
             },
             "TimeoutSeconds": 300,
