@@ -36,7 +36,7 @@ exports.handler = (event) => {
   console.log(results);
   const thing = results.find((result) => {
     console.log(result);
-    result.Payload.object !== undefined;
+    return result.Payload.object !== undefined;
   });
   console.log('HERE', thing);
 };
