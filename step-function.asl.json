@@ -14,7 +14,6 @@
       "Type": "Map",
       "MaxConcurrency": 1,
       "ItemsPath": "$.Payload.arns",
-      "ResultPath": "$.Payload.whatever",
       "Iterator": {
         "StartAt": "Format Channel History",
         "States": {
@@ -92,7 +91,7 @@
       "Parameters": {
         "FunctionName": "getSentiment",
         "Payload": {
-          "sentiment.$": "$.Payload.whatever"
+          "results.$": "$.[0]"
         }
       },
       "TimeoutSeconds": 300,

@@ -32,8 +32,7 @@
 // exports.handler = ({ history }) => Promise.all(history.map((item) => processHistory(item)));
 exports.handler = (event) => {
   console.log(event);
-  const { sentiment } = event;
-  const [[{ Payload }]] = sentiment;
-  const { range, bucket } = Payload;
-  console.log(Payload, range, bucket);
+  const { results } = event;
+  const thing = results.find((result) => result.Payload.object);
+  console.log('HERE', thing);
 };
