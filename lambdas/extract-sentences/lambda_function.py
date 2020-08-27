@@ -1,3 +1,6 @@
+import os
+import boto3
+import json
 import nltk
 
 nltk.data.path.append("/tmp")
@@ -8,13 +11,23 @@ max_length = 4500
 
 
 def lambda_handler(event, context):
-    records = event["history"]
+    client = boto3.client("s3")
+
+    bucket = event["bucket"]
+    s3_range = event["range"]
     key = event["key"]
-    messages = []
-    for record in records:
-        client_msg_id = record.get("client_msg_id")
-        ts = record.get("ts")
-        tokenized_sentences = nltk.sent_tokenize(record["text"])
+
+    response = client.get_object(
+        Bucket=bucket,
+        Key=key,
+    )
+
+    messages = json.dumps(response["Body"].read().decode("utf-8"))
+    objects = []
+    for message in messages:
+        client_msg_id = message.get("client_msg_id")
+        ts = message.get("ts")
+        tokenized_sentences = nltk.sent_tokenize(message["text"])
         filtered_sentences = list(
             set(
                 [
@@ -25,7 +38,29 @@ def lambda_handler(event, context):
             )
         )[:max_items]
         if client_msg_id is not None and len(filtered_sentences) > 0:
-            msg = {"ts": ts, "sentences": filtered_sentences}
-            messages.append(msg)
+            format = "txt"
+            s3_key = "{}/{}/{}.{}".format(
+                os.getenv("S3_PREFIX"),
+                s3_range,
+                ts,
+                format,
+            )
+            arn = "arn:aws:s3:::{}/{}".format(bucket, s3_key)
 
-    return {"history": messages, "key": key}
+            client.put_object(
+                Body="\n".join(filtered_sentences),
+                Bucket=bucket,
+                Key=s3_key,
+            )
+
+            objects.append(
+                {
+                    "bucket": bucket,
+                    "format": format,
+                    key: s3_key,
+                    range: s3_range,
+                    arn: arn,
+                }
+            )
+
+    return {"objects": objects, "range": s3_range}
