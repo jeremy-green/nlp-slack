@@ -1,4 +1,4 @@
-const { EOL } = require('os');
+// const { EOL } = require('os');
 
 const { S3 } = require('aws-sdk');
 const { WebClient } = require('@slack/web-api');
@@ -35,10 +35,23 @@ d.setMilliseconds(0);
 const oldest = d.getTime() / 1000;
 const latest = Date.now() / 1000;
 
-const histories = [];
-function saveMessages(content) {
-  histories.push(JSON.stringify(content));
-  return Promise.resolve();
+const arns = [];
+async function saveMessages(content) {
+  const key = `${prefix}/${Date.now()}`;
+  const format = 'txt';
+
+  const buffer = Buffer.from(JSON.stringify(content));
+
+  const params = {
+    Bucket: bucket,
+    Key: `${key}.${format}`,
+    Body: buffer,
+    ContentType: 'text/plain',
+  };
+
+  await s3.putObject(params).promise();
+
+  return { bucket, key, format, arn: `arn:aws:s3:::${bucket}/${key}.${format}` };
 }
 
 async function getMessages(cursor) {
@@ -53,7 +66,7 @@ async function getMessages(cursor) {
 
   const history = await web.conversations.history(opts);
 
-  await saveMessages(history);
+  arns.push(await saveMessages(history));
 
   if (history.has_more) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -63,19 +76,6 @@ async function getMessages(cursor) {
 
 exports.handler = async () => {
   await getMessages();
-  const key = `${prefix}/${oldest}-${latest}`;
-  const format = 'txt';
 
-  const buffer = Buffer.from(histories.join(EOL));
-
-  const params = {
-    Bucket: bucket,
-    Key: `${key}.${format}`,
-    Body: buffer,
-    ContentType: 'text/plain',
-  };
-
-  await s3.putObject(params).promise();
-
-  return { bucket, key, format, arn: `arn:aws:s3:::${bucket}/${key}.${format}` };
+  return arns;
 };
