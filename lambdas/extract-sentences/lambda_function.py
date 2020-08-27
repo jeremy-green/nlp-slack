@@ -26,11 +26,13 @@ def lambda_handler(event, context):
     print(messages)
     objects = []
     for message in messages:
+        print(message)
         client_msg_id = message.get("client_msg_id")
         ts = message.get("ts")
-
+        print(client_msg_id, ts)
         if client_msg_id is not None:
             tokenized_sentences = nltk.sent_tokenize(message["text"])
+            print(tokenized_sentences)
             filtered_sentences = list(
                 set(
                     [
@@ -40,7 +42,7 @@ def lambda_handler(event, context):
                     ]
                 )
             )[:max_items]
-
+            print(filtered_sentences)
             if len(filtered_sentences) > 0:
                 format = "txt"
                 s3_key = "{}/{}/{}.{}".format(
@@ -50,13 +52,14 @@ def lambda_handler(event, context):
                     format,
                 )
                 arn = "arn:aws:s3:::{}/{}".format(bucket, s3_key)
-
+                print("HERE")
                 client.put_object(
                     Body="\n".join(filtered_sentences),
                     Bucket=bucket,
                     Key=s3_key,
                 )
 
+                print("tHERE")
                 objects.append(
                     {
                         "bucket": bucket,
@@ -66,5 +69,6 @@ def lambda_handler(event, context):
                         arn: arn,
                     }
                 )
+                print("everywhere")
 
     return {"objects": objects, "range": s3_range}
