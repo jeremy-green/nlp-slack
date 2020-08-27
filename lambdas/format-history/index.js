@@ -20,7 +20,7 @@ function processHistory(item) {
     .promise();
 }
 
-async function createObject(item) {
+async function createObject(message) {
   const buffer = Buffer.from(JSON.stringify(message));
   const Key = `${key}/${Date.now()}.${format}`;
   const putObjectParams = {
