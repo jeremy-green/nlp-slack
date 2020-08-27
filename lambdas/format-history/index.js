@@ -11,8 +11,6 @@ const s3 = new S3({ region, accessKeyId, secretAccessKey });
 
 const limit = pLimit(10);
 
-console.log('HERE', prefix, bucket);
-
 function processHistory(item) {
   return dynamodb
     .putItem({
@@ -37,15 +35,12 @@ exports.handler = async (event) => {
   const arns = await Promise.all(
     messages.map((message) =>
       limit(async () => {
-        console.log(bucket, prefix);
         const buffer = Buffer.from(JSON.stringify(message));
-        const Key = `${prefix}/${Date.now()}.${format}`;
-        const putObjectParams = {
-          Body: buffer,
-          Bucket: bucket,
-          Key,
-        };
+        const Key = `${prefix}/${key}/${Date.now()}.${format}`;
+        const putObjectParams = { Body: buffer, Bucket: bucket, Key };
+
         console.log(putObjectParams);
+
         await s3.putObject(putObjectParams).promise();
         return { bucket, key: Key, arn: `arn:aws:s3:::${bucket}/${key}.${format}` };
       }),
