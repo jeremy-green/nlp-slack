@@ -23,8 +23,10 @@ def lambda_handler(event, context):
     )
 
     messages = json.loads(response["Body"].read().decode("utf-8"))
+    print(messages)
     objects = []
     for message in messages:
+        print(message)
         client_msg_id = message.get("client_msg_id")
         ts = message.get("ts")
         tokenized_sentences = nltk.sent_tokenize(message["text"])
