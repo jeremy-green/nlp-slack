@@ -37,7 +37,8 @@ const latest = Date.now() / 1000;
 
 const arns = [];
 async function saveMessages(content) {
-  const key = `${prefix}/${Date.now()}`;
+  const range = `${oldest}-${latest}`;
+  const key = `${prefix}/${range}/${Date.now()}`;
   const format = 'txt';
 
   const buffer = Buffer.from(JSON.stringify(content));
@@ -51,7 +52,7 @@ async function saveMessages(content) {
 
   await s3.putObject(params).promise();
 
-  return { bucket, key, format, arn: `arn:aws:s3:::${bucket}/${key}.${format}` };
+  return { bucket, key, format, range, arn: `arn:aws:s3:::${bucket}/${key}.${format}` };
 }
 
 async function getMessages(cursor) {

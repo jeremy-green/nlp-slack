@@ -21,7 +21,7 @@ function processHistory(item) {
 }
 
 exports.handler = async (event) => {
-  const { key, format, bucket: Bucket } = event;
+  const { key, format, range, bucket: Bucket } = event;
   const getObjectParams = {
     Key: `${key}.${format}`,
     Bucket,
@@ -36,13 +36,13 @@ exports.handler = async (event) => {
     messages.map((message) =>
       limit(async () => {
         const buffer = Buffer.from(JSON.stringify(message));
-        const Key = `${prefix}/${key}/${Date.now()}.${format}`;
+        const Key = `${prefix}/${range}/${Date.now()}.${format}`;
         const putObjectParams = { Body: buffer, Bucket: bucket, Key };
 
         console.log(putObjectParams);
 
         await s3.putObject(putObjectParams).promise();
-        return { bucket, key: Key, arn: `arn:aws:s3:::${bucket}/${key}.${format}` };
+        return { bucket, range, key: Key, arn: `arn:aws:s3:::${bucket}/${key}.${format}` };
       }),
     ),
   );
