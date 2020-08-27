@@ -53,20 +53,6 @@ async function handleImage({ ts, files }) {
   return dynamodb.updateItem(payload).promise();
 }
 
-// async function downloadFile({ key, format, range, bucket }) {
-//   const params = {
-//     Key: `${key}.${format}`,
-//     Bucket: bucket,
-//   };
-
-//   const data = await s3.getObject(params).promise();
-//   const payload = data.Body.toString('utf-8').split(EOL);
-//   const { messages } = JSON.parse(payload);
-//   return messages;
-// }
-
-// exports.handler = async ({ history }) => Promise.all(getImages(history).map(handleImage));
-
 exports.handler = async ({ key, bucket }) => {
   const params = { Key: key, Bucket: bucket };
   const data = await s3.getObject(params).promise();
