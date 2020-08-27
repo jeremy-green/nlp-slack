@@ -1,16 +1,17 @@
 const fetch = require('node-fetch');
 
-const { DynamoDB, Rekognition } = require('aws-sdk');
+const { DynamoDB, Rekognition, S3 } = require('aws-sdk');
 const { accessKeyId, secretAccessKey, region, botToken } = require('config');
 const { generateDBObj } = require('@nlp-slack/helpers');
 
 const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
 const rekognition = new Rekognition({ region, accessKeyId, secretAccessKey });
+const s3 = new S3({ region, accessKeyId, secretAccessKey });
 
 const SUPPORTED_IMAGES = ['png', 'jpg', 'gif'];
 
-function getImages(history) {
-  return history.reduce((acc, curr) => {
+function getImages(messages) {
+  return messages.reduce((acc, curr) => {
     const { ts, files = [] } = curr;
     if (files.length) {
       return [...acc, { ts, files }];
@@ -52,4 +53,29 @@ async function handleImage({ ts, files }) {
   return dynamodb.updateItem(payload).promise();
 }
 
-exports.handler = async ({ history }) => Promise.all(getImages(history).map(handleImage));
+// async function downloadFile({ key, format, range, bucket }) {
+//   const params = {
+//     Key: `${key}.${format}`,
+//     Bucket: bucket,
+//   };
+
+//   const data = await s3.getObject(params).promise();
+//   const payload = data.Body.toString('utf-8').split(EOL);
+//   const { messages } = JSON.parse(payload);
+//   return messages;
+// }
+
+// exports.handler = async ({ history }) => Promise.all(getImages(history).map(handleImage));
+
+exports.handler = async ({ key, format, range, bucket }) => {
+  const params = {
+    Key: `${key}.${format}`,
+    Bucket: bucket,
+  };
+
+  const data = await s3.getObject(params).promise();
+  const payload = data.Body.toString('utf-8').split(EOL);
+  const { messages } = JSON.parse(payload);
+
+  return Promise.all(getImages(messages).map(handleImage));
+};

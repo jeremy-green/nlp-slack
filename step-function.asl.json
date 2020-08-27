@@ -14,6 +14,7 @@
       "Type": "Map",
       "MaxConcurrency": 1,
       "ItemsPath": "$.Payload.arns",
+      "ResultPath": "$.Payload.whatever",
       "Iterator": {
         "StartAt": "Format Channel History",
         "States": {
@@ -37,6 +38,27 @@
             "Type": "Parallel",
             "End": true,
             "Branches": [
+              {
+                "StartAt": "Process Images",
+                "States": {
+                  "Process Images": {
+                    "Type": "Task",
+                    "Resource": "arn:aws:states:::lambda:invoke",
+                    "Parameters": {
+                      "FunctionName": "processImages",
+                      "Payload": {
+                        "bucket.$": "$.Payload.bucket",
+                        "key.$": "$.Payload.key",
+                        "format.$": "$.Payload.format",
+                        "range.$": "$.Payload.range",
+                        "arn.$": "$.Payload.arn"
+                      }
+                    },
+                    "TimeoutSeconds": 300,
+                    "End": true
+                  }
+                }
+              },
               {
                 "StartAt": "Extract Sentences",
                 "States": {
@@ -70,7 +92,7 @@
       "Parameters": {
         "FunctionName": "getSentiment",
         "Payload": {
-          "history.$": "$.Payload.history"
+          "sentiment.$": "$.Payload.whatever"
         }
       },
       "TimeoutSeconds": 300,
