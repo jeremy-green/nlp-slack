@@ -68,10 +68,9 @@ async function handleImage({ ts, files }) {
 // exports.handler = async ({ history }) => Promise.all(getImages(history).map(handleImage));
 
 exports.handler = async ({ key, bucket }) => {
-  console.log(key, bucket);
   const params = { Key: key, Bucket: bucket };
   const data = await s3.getObject(params).promise();
-  const { messages } = data.Body.toString('utf-8');
+  const messages = data.Body.toString('utf-8');
   console.log(messages);
 
   return Promise.all(getImages(messages).map(handleImage));
