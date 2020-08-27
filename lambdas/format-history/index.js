@@ -32,20 +32,9 @@ exports.handler = async (event) => {
   const { messages } = JSON.parse(payload);
 
   await Promise.all(messages.map((message) => limit(() => processHistory(message))));
-  const arns = await Promise.all(
-    messages.map((message) =>
-      limit(async () => {
-        const buffer = Buffer.from(JSON.stringify(message));
-        const Key = `${prefix}/${range}/${Date.now()}.${format}`;
-        const putObjectParams = { Body: buffer, Bucket: bucket, Key };
-
-        console.log(putObjectParams);
-
-        await s3.putObject(putObjectParams).promise();
-        return { bucket, range, key: Key, arn: `arn:aws:s3:::${bucket}/${key}.${format}` };
-      }),
-    ),
-  );
-
-  return { arns };
+  const buffer = Buffer.from(JSON.stringify(messages));
+  const Key = `${prefix}/${range}/${Date.now()}.${format}`;
+  const putObjectParams = { Body: buffer, Bucket: bucket, Key };
+  await s3.putObject(putObjectParams).promise();
+  return { bucket, range, key: Key, arn: `arn:aws:s3:::${bucket}/${key}.${format}` };
 };
