@@ -36,6 +36,7 @@
           "Process Superfluous Info": {
             "Type": "Parallel",
             "End": true,
+            "ResultPath": "$.ProcessSuperfluousInfo",
             "Branches": [
               {
                 "StartAt": "Process Images",
@@ -43,6 +44,7 @@
                   "Process Images": {
                     "Type": "Task",
                     "Resource": "arn:aws:states:::lambda:invoke",
+                    "ResultPath": "$.ProcessImages",
                     "Parameters": {
                       "FunctionName": "processImages",
                       "Payload": {
@@ -64,6 +66,7 @@
                   "Extract Sentences": {
                     "Type": "Task",
                     "Resource": "arn:aws:states:::lambda:invoke",
+                    "ResultPath": "$.ExtractSentences",
                     "Parameters": {
                       "FunctionName": "extractSentences",
                       "Payload": {
