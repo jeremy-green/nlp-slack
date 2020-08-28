@@ -12,8 +12,9 @@
     },
     "Concurrent Lambdas": {
       "Type": "Map",
-      "MaxConcurrency": 2,
+      "MaxConcurrency": 5,
       "ItemsPath": "$.Payload.arns",
+      "ResultPath": "$",
       "Iterator": {
         "StartAt": "Format Channel History",
         "States": {
@@ -26,8 +27,7 @@
                 "bucket.$": "$.bucket",
                 "key.$": "$.key",
                 "format.$": "$.format",
-                "range.$": "$.range",
-                "arn.$": "$.arn"
+                "range.$": "$.range"
               }
             },
             "TimeoutSeconds": 300,
@@ -36,7 +36,6 @@
           "Process Superfluous Info": {
             "Type": "Parallel",
             "End": true,
-            "ResultPath": "$.ProcessSuperfluousInfo",
             "Branches": [
               {
                 "StartAt": "Process Images",
@@ -44,15 +43,13 @@
                   "Process Images": {
                     "Type": "Task",
                     "Resource": "arn:aws:states:::lambda:invoke",
-                    "ResultPath": "$.ProcessImages",
                     "Parameters": {
                       "FunctionName": "processImages",
                       "Payload": {
                         "bucket.$": "$.Payload.bucket",
                         "key.$": "$.Payload.key",
                         "format.$": "$.Payload.format",
-                        "range.$": "$.Payload.range",
-                        "arn.$": "$.Payload.arn"
+                        "range.$": "$.Payload.range"
                       }
                     },
                     "TimeoutSeconds": 300,
@@ -73,8 +70,7 @@
                         "bucket.$": "$.Payload.bucket",
                         "key.$": "$.Payload.key",
                         "format.$": "$.Payload.format",
-                        "range.$": "$.Payload.range",
-                        "arn.$": "$.Payload.arn"
+                        "range.$": "$.Payload.range"
                       }
                     },
                     "TimeoutSeconds": 300,

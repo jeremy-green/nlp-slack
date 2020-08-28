@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');
+const pLimit = require('p-limit');
 
 const { DynamoDB, Rekognition, S3 } = require('aws-sdk');
 const { accessKeyId, secretAccessKey, region, botToken } = require('config');
@@ -7,6 +8,8 @@ const { generateDBObj } = require('@nlp-slack/helpers');
 const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
 const rekognition = new Rekognition({ region, accessKeyId, secretAccessKey });
 const s3 = new S3({ region, accessKeyId, secretAccessKey });
+
+const limit = pLimit(10);
 
 const SUPPORTED_IMAGES = ['png', 'jpg'];
 const AWS_MAX_IMAGE_SIZE = 5242880;
@@ -62,7 +65,5 @@ exports.handler = async ({ key, bucket }) => {
   const params = { Key: key, Bucket: bucket };
   const data = await s3.getObject(params).promise();
   const messages = JSON.parse(data.Body.toString('utf-8'));
-  console.log(typeof messages);
-
-  await Promise.all(getImages(messages).map(handleImage));
+  await Promise.all(getImages(messages).map((message) => limit(() => handleImage(message))));
 };

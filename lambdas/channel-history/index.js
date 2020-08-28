@@ -21,7 +21,7 @@ const d = new Date();
 
 if (fullHistory === 'true') {
   d.setFullYear(2020);
-  d.setMonth(0);
+  d.setMonth(6);
   d.setDate(1);
 }
 
@@ -50,7 +50,7 @@ async function saveMessages(content) {
 
   await s3.putObject(params).promise();
 
-  return { bucket, key, format, range, arn: `arn:aws:s3:::${bucket}/${key}.${format}` };
+  return { bucket, key, format, range };
 }
 
 async function getMessages(cursor) {

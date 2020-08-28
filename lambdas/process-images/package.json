@@ -9,13 +9,14 @@
   "scripts": {
     "build": "mkdir -p ../../tmp && zip -r ../../tmp/process-images.zip .",
     "update": "aws lambda update-function-code --function processImages --zip-file fileb://../../tmp/process-images.zip",
-    "publish": "npm run lint && npm run build && npm run update",
+    "publish": "npm run build && npm run update",
     "lint": "npx eslint index.js",
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
   "dependencies": {
     "@nlp-slack/helpers": "^0.0.0",
     "config": "^3.3.1",
-    "node-fetch": "^2.6.0"
+    "node-fetch": "^2.6.0",
+    "p-limit": "^3.0.2"
   }
 }
