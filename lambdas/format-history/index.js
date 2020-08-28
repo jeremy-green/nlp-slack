@@ -11,7 +11,8 @@ const s3 = new S3({ region, accessKeyId, secretAccessKey });
 
 const limit = pLimit(10);
 
-function processHistory(item) {
+async function processHistory(item) {
+  await new Promise((resolve) => setTimeout(() => resolve(), 500));
   return dynamodb
     .putItem({
       TableName: 'messages',
