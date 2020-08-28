@@ -1,5 +1,3 @@
-// const { EOL } = require('os');
-
 const { S3 } = require('aws-sdk');
 const { WebClient } = require('@slack/web-api');
 
@@ -21,11 +19,11 @@ const s3 = new S3({ region, accessKeyId, secretAccessKey, endpoint });
 
 const d = new Date();
 
-if (fullHistory === 'true') {
-  d.setFullYear(2020);
-  d.setMonth(0);
-  d.setDate(1);
-}
+// if (fullHistory === 'true') {
+d.setFullYear(2020);
+d.setMonth(4);
+d.setDate(1);
+// }
 
 d.setHours(0);
 d.setMinutes(0);
