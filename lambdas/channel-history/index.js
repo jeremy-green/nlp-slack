@@ -1,17 +1,7 @@
 const { S3 } = require('aws-sdk');
 const { WebClient } = require('@slack/web-api');
 
-const {
-  botToken,
-  region,
-  accessKeyId,
-  secretAccessKey,
-  channel,
-  bucket,
-  prefix,
-  endpoint,
-  fullHistory,
-} = require('config');
+const { botToken, region, accessKeyId, secretAccessKey, channel, bucket, prefix, endpoint } = require('config');
 
 const botOptions = {};
 const web = new WebClient(botToken, botOptions);
