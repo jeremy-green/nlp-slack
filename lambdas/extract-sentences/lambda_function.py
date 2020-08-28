@@ -6,6 +6,8 @@ import nltk
 nltk.data.path.append("/tmp")
 nltk.download("punkt", download_dir="/tmp")
 
+prefix = os.getenv("S3_PREFIX")
+
 max_items = 25
 max_length = 4500
 
@@ -46,7 +48,7 @@ def lambda_handler(event, context):
         if client_msg_id is not None and len(filtered_sentences) > 0:
             format = "txt"
             s3_key = "{}/{}/{}.{}".format(
-                os.getenv("S3_PREFIX"),
+                prefix,
                 s3_range,
                 ts,
                 format,
@@ -73,4 +75,5 @@ def lambda_handler(event, context):
         "objects": objects,
         "range": s3_range,
         "bucket": bucket,
+        "prefix": prefix,
     }

@@ -1,39 +1,30 @@
-// const { Comprehend, DynamoDB } = require('aws-sdk');
-// const { accessKeyId, secretAccessKey, region = 'us-east-1' } = require('config');
-// const { generateDBObj } = require('@nlp-slack/helpers');
+const { Comprehend } = require('aws-sdk');
+const {
+  accessKeyId,
+  secretAccessKey,
+  region,
+  dataAccessRoleArn,
+  prefix: outputPrefix,
+  bucket: outputBucket,
+} = require('config');
 
-// const comprehend = new Comprehend({ region, accessKeyId, secretAccessKey });
-// const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
-
-// async function processHistory(item) {
-//   const { ts, sentences } = item;
-//   const params = {
-//     LanguageCode: 'en',
-//     TextList: sentences,
-//   };
-
-//   await new Promise((resolve) => setTimeout(() => resolve(), 1000));
-
-//   const { ResultList: resultList } = await comprehend.batchDetectSentiment(params).promise();
-
-//   const payload = {
-//     TableName: 'messages',
-//     Key: { ts: { S: ts } },
-//     UpdateExpression: 'SET #SENTIMENT = :SENTIMENT',
-//     ExpressionAttributeNames: { '#SENTIMENT': 'SENTIMENT' },
-//     ExpressionAttributeValues: {
-//       ':SENTIMENT': { M: generateDBObj(resultList) },
-//     },
-//   };
-
-//   return dynamodb.updateItem(payload).promise();
-// }
-
-// exports.handler = ({ history }) => Promise.all(history.map((item) => processHistory(item)));
-exports.handler = (event) => {
-  console.log(event);
-  const { results } = event;
-  console.log(results);
-  const thing = results.find((result) => console.log(result.Payload) || result.Payload.objects !== undefined);
-  console.log('HERE', thing);
+const comprehend = new Comprehend({ region, accessKeyId, secretAccessKey });
+exports.handler = async ({ results }) => {
+  const {
+    Payload: { bucket: inputBucket, range, prefix: inputPrefix },
+  } = results.find((result) => result.Payload.objects !== undefined);
+  const params = {
+    DataAccessRoleArn: dataAccessRoleArn,
+    InputDataConfig: {
+      S3Uri: `s3://${inputBucket}/${inputPrefix}/${range}`,
+      InputFormat: 'ONE_DOC_PER_LINE',
+    },
+    LanguageCode: 'en',
+    OutputDataConfig: {
+      S3Uri: `s3://${outputBucket}/${outputPrefix}/${range}`,
+    },
+  };
+  const result = await comprehend.startSentimentDetectionJob(params).promise();
+  console.log(result);
+  return result;
 };
