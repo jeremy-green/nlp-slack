@@ -39,5 +39,5 @@ exports.handler = async (event) => {
   const putObjectParams = { Body: buffer, Bucket: bucket, Key: newKey };
   await s3.putObject(putObjectParams).promise();
 
-  return { bucket, range, key: newKey, arn: `arn:aws:s3:::${bucket}/${newKey}`, format: newFormat };
+  return { bucket, range, key: newKey, format: newFormat };
 };
