@@ -9,7 +9,7 @@ const { generateDBObj } = require('@nlp-slack/helpers');
 const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
 const s3 = new S3({ region, accessKeyId, secretAccessKey });
 
-const limit = pLimit(10);
+const limit = pLimit(1);
 
 async function processHistory(item) {
   await new Promise((resolve) => setTimeout(() => resolve(), 500));

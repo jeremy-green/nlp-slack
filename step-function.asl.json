@@ -12,9 +12,9 @@
     },
     "Concurrent Lambdas": {
       "Type": "Map",
-      "MaxConcurrency": 5,
+      "MaxConcurrency": 1,
       "ItemsPath": "$.Payload.arns",
-      "ResultPath": "$",
+      "ResultPath": "$.Payload.arns",
       "Iterator": {
         "StartAt": "Format Channel History",
         "States": {
@@ -90,7 +90,7 @@
       "Parameters": {
         "FunctionName": "getSentiment",
         "Payload": {
-          "results.$": "$.[0]",
+          "results.$": "$",
           "TaskToken.$": "$$.Task.Token"
         }
       },

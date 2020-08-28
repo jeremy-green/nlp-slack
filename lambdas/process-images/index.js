@@ -9,7 +9,7 @@ const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
 const rekognition = new Rekognition({ region, accessKeyId, secretAccessKey });
 const s3 = new S3({ region, accessKeyId, secretAccessKey });
 
-const limit = pLimit(10);
+const limit = pLimit(1);
 
 const SUPPORTED_IMAGES = ['png', 'jpg'];
 const AWS_MAX_IMAGE_SIZE = 5242880;
