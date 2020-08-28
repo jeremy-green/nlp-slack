@@ -39,7 +39,6 @@ def lambda_handler(event, context):
     )
 
     messages = json.loads(response["Body"].read().decode("utf-8"))
-    objects = []
     for message in messages:
         client_msg_id = message.get("client_msg_id")
         ts = message.get("ts")
@@ -61,19 +60,4 @@ def lambda_handler(event, context):
                 Key=s3_key,
             )
 
-            objects.append(
-                {
-                    "bucket": bucket,
-                    "format": format,
-                    "key": s3_key,
-                    "range": s3_range,
-                    "arn": arn,
-                }
-            )
-
-    return {
-        "objects": objects,
-        "range": s3_range,
-        "bucket": bucket,
-        "prefix": prefix,
-    }
+    return {"range": s3_range, "bucket": bucket, "prefix": prefix}
