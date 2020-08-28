@@ -87,11 +87,12 @@
     },
     "Process Sentiment": {
       "Type": "Task",
-      "Resource": "arn:aws:states:::lambda:invoke",
+      "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
       "Parameters": {
         "FunctionName": "getSentiment",
         "Payload": {
-          "results.$": "$.[0]"
+          "results.$": "$.[0]",
+          "TaskToken.$": "$$.Task.Token"
         }
       },
       "TimeoutSeconds": 300,
