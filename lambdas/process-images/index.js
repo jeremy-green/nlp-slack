@@ -36,8 +36,11 @@ async function processImages({ url_private: urlPrivate }) {
 }
 
 async function handleImage({ ts, files }) {
+  console.log(files);
   const analyzedFiles = await Promise.all(
-    files.filter(({ filetype }) => SUPPORTED_IMAGES.includes(filetype)).map(processImages),
+    files
+      .filter(({ filetype }) => console.log('HERE', filetype) || SUPPORTED_IMAGES.includes(filetype))
+      .map(processImages),
   );
 
   const payload = {
