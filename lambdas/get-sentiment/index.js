@@ -15,7 +15,7 @@ exports.handler = async (event) => {
   const { results, TaskToken: taskToken } = event;
   const {
     Payload: { bucket: inputBucket, range, prefix: inputPrefix },
-  } = results.find((result) => result.Payload.objects !== undefined);
+  } = results.find((result) => result.Payload !== undefined);
   const params = {
     DataAccessRoleArn: dataAccessRoleArn,
     InputDataConfig: {
