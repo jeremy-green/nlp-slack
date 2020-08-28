@@ -8,7 +8,7 @@ const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
 const rekognition = new Rekognition({ region, accessKeyId, secretAccessKey });
 const s3 = new S3({ region, accessKeyId, secretAccessKey });
 
-const SUPPORTED_IMAGES = ['png', 'jpg', 'gif'];
+const SUPPORTED_IMAGES = ['png', 'jpg'];
 
 function getImages(messages) {
   return messages.reduce((acc, curr) => {
