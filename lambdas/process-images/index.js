@@ -9,6 +9,7 @@ const rekognition = new Rekognition({ region, accessKeyId, secretAccessKey });
 const s3 = new S3({ region, accessKeyId, secretAccessKey });
 
 const SUPPORTED_IMAGES = ['png', 'jpg'];
+const AWS_MAX_IMAGE_SIZE = 5242880;
 
 function getImages(messages) {
   return messages.reduce((acc, curr) => {
@@ -39,7 +40,8 @@ async function handleImage({ ts, files }) {
   console.log(files);
   const analyzedFiles = await Promise.all(
     files
-      .filter(({ filetype }) => console.log('HERE', filetype) || SUPPORTED_IMAGES.includes(filetype))
+      .filter(({ filetype }) => SUPPORTED_IMAGES.includes(filetype))
+      .filter(({ size }) => size <= AWS_MAX_IMAGE_SIZE)
       .map(processImages),
   );
 
