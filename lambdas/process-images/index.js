@@ -64,5 +64,5 @@ exports.handler = async ({ key, bucket }) => {
   const messages = JSON.parse(data.Body.toString('utf-8'));
   console.log(typeof messages);
 
-  return Promise.all(getImages(messages).map(handleImage));
+  await Promise.all(getImages(messages).map(handleImage));
 };
