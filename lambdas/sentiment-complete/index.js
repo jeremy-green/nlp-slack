@@ -84,12 +84,12 @@ exports.handler = (event) => {
 
     const { dir } = path.parse(key);
     console.log(dir);
-    const range = dir.split('/')[1];
-    console.log(range);
+    const [prefix, range] = dir.split('/');
+    console.log(prefix, range);
     const eventDetailsObject = await s3
       .getObject({
         Bucket: name,
-        Key: `${range}/event-details.json`,
+        Key: `${prefix}/${range}/event-details.json`,
       })
       .promise();
 
