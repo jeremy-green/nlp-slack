@@ -52,7 +52,6 @@ def lambda_handler(event, context):
                 ts,
                 format,
             )
-            arn = "arn:aws:s3:::{}/{}".format(bucket, s3_key)
 
             client.put_object(
                 Body="\n".join(filtered_sentences),
