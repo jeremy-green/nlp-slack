@@ -95,7 +95,6 @@
           "TaskToken.$": "$$.Task.Token"
         }
       },
-      "TimeoutSeconds": 300,
       "End": true
     }
   }
