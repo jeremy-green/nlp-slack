@@ -43,11 +43,7 @@ exports.handler = (event) => {
       object: { key },
     } = s3Property;
 
-    console.log(s3Property);
-
     const items = await getObjectAndParse({ Bucket: name, Key: key });
-
-    console.log(items);
 
     const dynamoDBMap = items.reduce((acc, curr) => {
       const { File: file } = curr;
@@ -56,13 +52,9 @@ exports.handler = (event) => {
       return { ...acc, [file]: item };
     }, {});
 
-    console.log(dynamoDBMap);
-
-    const dynamoDBResult = await Promise.all(
+    await Promise.all(
       Object.entries(dynamoDBMap).map(([prop, val]) => {
-        console.log(prop);
         const extension = path.extname(prop);
-        console.log(extension);
         const ts = path.basename(prop, extension);
 
         const updateParams = {
@@ -75,17 +67,12 @@ exports.handler = (event) => {
           },
         };
 
-        console.log(updateParams);
         return dynamodb.updateItem(updateParams).promise();
       }),
     );
 
-    console.log(dynamoDBResult);
-
     const { dir } = path.parse(key);
-    console.log(dir);
     const [prefix, range] = dir.split('/');
-    console.log(prefix, range);
     const eventDetailsObject = await s3
       .getObject({
         Bucket: name,
@@ -93,9 +80,7 @@ exports.handler = (event) => {
       })
       .promise();
 
-    console.log(eventDetailsObject);
     const eventDetails = JSON.parse(eventDetailsObject.Body.toString('utf-8'));
-    console.log(eventDetails);
     const { taskToken } = eventDetails;
     return stepFunctions
       .sendTaskSuccess({
