@@ -1,3 +1,3 @@
-const { generateDBObj } = require('./lib/mappings');
+const { generateDBObj, generateMessageObj, mapDBProps, mapMessageProps } = require('./lib/mappings');
 
-module.exports = { generateDBObj };
+module.exports = { generateDBObj, generateMessageObj, mapDBProps, mapMessageProps };

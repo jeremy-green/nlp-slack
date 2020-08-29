@@ -6,7 +6,7 @@ const tar = require('tar');
 
 const { DynamoDB, S3, StepFunctions } = require('aws-sdk');
 const { accessKeyId, secretAccessKey, region } = require('config');
-const { generateDBObj } = require('@nlp-slack/helpers');
+const { mapDBProps } = require('@nlp-slack/helpers');
 
 const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
 const s3 = new S3({ region, accessKeyId, secretAccessKey });
@@ -63,7 +63,7 @@ exports.handler = (event) => {
           UpdateExpression: 'SET #SENTIMENT = :SENTIMENT',
           ExpressionAttributeNames: { '#SENTIMENT': 'SENTIMENT' },
           ExpressionAttributeValues: {
-            ':SENTIMENT': { L: generateDBObj(val) },
+            ':SENTIMENT': mapDBProps(val),
           },
         };
 

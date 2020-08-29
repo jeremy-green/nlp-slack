@@ -50,3 +50,6 @@ exports.generateDBObj = (input) =>
 
 exports.generateMessageObj = (input) =>
   Object.entries(input).reduce((acc, [key, val]) => ({ ...acc, [key]: mapMessageProps(val) }), {});
+
+exports.mapDBProps = mapDBProps;
+exports.mapMessageProps = mapMessageProps;

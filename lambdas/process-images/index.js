@@ -3,7 +3,7 @@ const pLimit = require('p-limit');
 
 const { DynamoDB, Rekognition, S3 } = require('aws-sdk');
 const { accessKeyId, secretAccessKey, region, botToken } = require('config');
-const { generateDBObj } = require('@nlp-slack/helpers');
+const { mapDBProps } = require('@nlp-slack/helpers');
 
 const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
 const rekognition = new Rekognition({ region, accessKeyId, secretAccessKey });
@@ -54,7 +54,7 @@ async function handleImage({ ts, files }) {
     UpdateExpression: 'SET #LABELS = :LABELS',
     ExpressionAttributeNames: { '#LABELS': 'LABELS' },
     ExpressionAttributeValues: {
-      ':LABELS': { M: generateDBObj(analyzedFiles) },
+      ':LABELS': mapDBProps(analyzedFiles),
     },
   };
 
