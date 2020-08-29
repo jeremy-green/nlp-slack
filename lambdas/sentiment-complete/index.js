@@ -63,7 +63,7 @@ exports.handler = (event) => {
           UpdateExpression: 'SET #SENTIMENT = :SENTIMENT',
           ExpressionAttributeNames: { '#SENTIMENT': 'SENTIMENT' },
           ExpressionAttributeValues: {
-            ':SENTIMENT': { M: generateDBObj(val) },
+            ':SENTIMENT': { L: generateDBObj(val) },
           },
         };
 
