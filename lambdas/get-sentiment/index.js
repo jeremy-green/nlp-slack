@@ -4,7 +4,6 @@ const {
   secretAccessKey,
   region,
   dataAccessRoleArn,
-  inputPrefix,
   prefix: outputPrefix,
   bucket: outputBucket,
 } = require('config');
@@ -12,12 +11,11 @@ const {
 const comprehend = new Comprehend({ region, accessKeyId, secretAccessKey });
 const s3 = new S3({ region, accessKeyId, secretAccessKey });
 exports.handler = async (event) => {
-  console.log(JSON.stringify(event, null, 2));
-  return;
+  console.log(event);
   const { results, TaskToken: taskToken } = event;
   const {
-    Payload: { bucket: inputBucket, range },
-  } = results;
+    Payload: { bucket: inputBucket, range, prefix: inputPrefix },
+  } = results.find((result) => result.Payload);
   const params = {
     DataAccessRoleArn: dataAccessRoleArn,
     InputDataConfig: {

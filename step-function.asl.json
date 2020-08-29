@@ -12,9 +12,9 @@
     },
     "Concurrent Lambdas": {
       "Type": "Map",
-      "MaxConcurrency": 1,
+      "MaxConcurrency": 4,
       "ItemsPath": "$.Payload.arns",
-      "ResultPath": "$.Payload.arns",
+      "OutputPath": "$.[0]",
       "Iterator": {
         "StartAt": "Format Channel History",
         "States": {
@@ -63,7 +63,6 @@
                   "Extract Sentences": {
                     "Type": "Task",
                     "Resource": "arn:aws:states:::lambda:invoke",
-                    "ResultPath": "$.ExtractSentences",
                     "Parameters": {
                       "FunctionName": "extractSentences",
                       "Payload": {
