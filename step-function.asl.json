@@ -13,7 +13,7 @@
     "Concurrent Lambdas": {
       "Type": "Map",
       "MaxConcurrency": 4,
-      "ItemsPath": "$.Payload.arns",
+      "ItemsPath": "$.Payload.objects",
       "OutputPath": "$.[0]",
       "Iterator": {
         "StartAt": "Format Channel History",

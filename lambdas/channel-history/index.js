@@ -21,7 +21,7 @@ const d = new Date();
 
 if (fullHistory === 'true') {
   d.setFullYear(2020);
-  d.setMonth(6);
+  d.setMonth(0);
   d.setDate(1);
 }
 
@@ -33,7 +33,7 @@ d.setMilliseconds(0);
 const oldest = d.getTime() / 1000;
 const latest = Date.now() / 1000;
 
-const arns = [];
+const objects = [];
 async function saveMessages(content) {
   const range = `${oldest}-${latest}`;
   const key = `${prefix}/${range}/${Date.now()}`;
@@ -65,7 +65,7 @@ async function getMessages(cursor) {
 
   const history = await web.conversations.history(opts);
 
-  arns.push(await saveMessages(history));
+  objects.push(await saveMessages(history));
 
   if (history.has_more) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -76,5 +76,5 @@ async function getMessages(cursor) {
 exports.handler = async () => {
   await getMessages();
 
-  return { arns };
+  return { objects };
 };

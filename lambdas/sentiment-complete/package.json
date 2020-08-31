@@ -9,7 +9,7 @@
   "scripts": {
     "build": "mkdir -p ../../tmp && zip -r ../../tmp/sentiment-complete.zip .",
     "update": "aws lambda update-function-code --function sentimentComplete --zip-file fileb://../../tmp/sentiment-complete.zip",
-    "publish": "npm run lint && npm run build && npm run update",
+    "publish": "npm run build && npm run update",
     "lint": "npx eslint index.js",
     "test": "echo \"Error: run tests from root\" && exit 1"
   },

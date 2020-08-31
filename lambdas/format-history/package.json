@@ -1,7 +1,7 @@
 {
   "name": "@nlp-slack/format-history",
   "version": "0.0.0",
-  "description": "Now I’m the model of a modern major general / The venerated Virginian veteran whose men are all / Lining up, to put me up on a pedestal / Writin’ letters to relatives / Embellishin’ my elegance and eloquence / But the elephant is in the room / The truth is in ya face when ya hear the British cannons go / BOOM",
+  "description": "",
   "keywords": [],
   "author": "Jeremy Green <hello@jeremy.green>",
   "license": "ISC",
@@ -9,7 +9,7 @@
   "scripts": {
     "build": "mkdir -p ../../tmp && zip -r ../../tmp/format-history.zip .",
     "update": "aws lambda update-function-code --function formatHistory --zip-file fileb://../../tmp/format-history.zip",
-    "publish": "npm run lint && npm run build && npm run update",
+    "publish": "npm run build && npm run update",
     "lint": "npx eslint index.js",
     "test": "echo \"Error: run tests from root\" && exit 1"
   },
