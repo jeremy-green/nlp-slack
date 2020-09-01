@@ -7,14 +7,19 @@
   "license": "ISC",
   "main": "index.js",
   "scripts": {
-    "build": "mkdir -p ../../tmp && zip -r ../../tmp/channel-history.zip .",
+    "build": "mkdir -p ../../tmp && zip -r ../../tmp/channel-history.zip . -x \"__tests__/*\" \"__mocks__/*\" \".jest/*\"",
     "update": "aws lambda update-function-code --function getChannelHistory --zip-file fileb://../../tmp/channel-history.zip",
-    "publish": "npm run lint && npm run build && npm run update",
-    "lint": "npx eslint index.js",
-    "test": "echo \"Error: run tests from root\" && exit 1"
+    "publish": "npm run build && npm run update"
   },
   "dependencies": {
     "@slack/web-api": "^5.10.0",
     "config": "^3.3.1"
+  },
+  "jest": {
+    "collectCoverage": true,
+    "coverageDirectory": "../../coverage/channel-history",
+    "setupFiles": [
+      "./.jest/set-env-vars.js"
+    ]
   }
 }

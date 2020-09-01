@@ -4,13 +4,16 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "scripts": {
+    "test": "jest",
+    "lint": "eslint ./lambdas/**/index.js"
+  },
   "dependencies": {
+    "@slack-wrench/jest-mock-web-client": "^1.2.0",
+    "aws-sdk": "^2.743.0",
     "create-react-app": "^3.4.1",
     "eslint": "^7.7.0",
     "eslint-config-airbnb-base": "^14.2.0",
@@ -18,8 +21,14 @@
     "eslint-plugin-import": "^2.22.0",
     "express-generator": "^4.16.1",
     "husky": "^4.2.5",
+    "jest": "^26.4.2",
     "lerna": "^3.22.1",
     "nodemon": "^2.0.4"
+  },
+  "jest": {
+    "projects": [
+      "<rootDir>/lambdas/*"
+    ]
   },
   "husky": {
     "hooks": {

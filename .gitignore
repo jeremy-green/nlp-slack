@@ -3,6 +3,7 @@ tmp
 *.log
 .DS_Store
 v-env
+coverage
 
 # Store pieces of code that might be useful again... but mostly garbage
 junk
