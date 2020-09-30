@@ -1,20 +1,125 @@
 {
-  "StartAt": "Get Channel History",
+  "StartAt": "Configure Process",
   "States": {
-    "Get Channel History": {
+    "Configure Process": {
       "Type": "Task",
       "Resource": "arn:aws:states:::lambda:invoke",
       "Parameters": {
-        "FunctionName": "getChannelHistory"
+        "FunctionName": "configureProcess",
+        "Payload": {
+          "something": true
+        }
       },
-      "TimeoutSeconds": 300,
-      "Next": "Concurrent Lambdas"
+      "ResultSelector": {
+        "years.$": "$.Payload.years",
+        "id.$": "$.Payload.id",
+        "cursor.$": "$.Payload.cursor",
+        "hasMore.$": "$.Payload.hasMore"
+      },
+      "ResultPath": "$",
+      "Next": "Get Channel History (Concurrent)"
     },
-    "Concurrent Lambdas": {
+    "Get Channel History (Concurrent)": {
       "Type": "Map",
       "MaxConcurrency": 4,
-      "ItemsPath": "$.Payload.objects",
+      "ItemsPath": "$.years",
       "OutputPath": "$.[0]",
+      "Next": "List Bucket Objects",
+      "Parameters": {
+        "year.$": "$$.Map.Item.Value",
+        "id.$": "$.id",
+        "cursor.$": "$.cursor",
+        "hasMore.$": "$.hasMore"
+      },
+      "Iterator": {
+        "StartAt": "History Iterator",
+        "States": {
+          "History Iterator": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "Parameters": {
+              "FunctionName": "historyIterator",
+              "Payload": {
+                "year.$": "$.year",
+                "id.$": "$.id",
+                "cursor.$": "$.cursor",
+                "hasMore.$": "$.hasMore"
+              }
+            },
+            "ResultPath": "$.historyIterator",
+            "Next": "Is Count Reached"
+          },
+          "Is Count Reached": {
+            "Type": "Choice",
+            "Choices": [
+              {
+                "Variable": "$.hasMore",
+                "BooleanEquals": true,
+                "Next": "Wait One Second"
+              }
+            ],
+            "Default": "Done"
+          },
+          "Wait One Second": {
+            "Type": "Wait",
+            "Seconds": 1,
+            "Next": "Get Channel History"
+          },
+          "Get Channel History": {
+            "Type": "Task",
+            "Resource": "arn:aws:states:::lambda:invoke",
+            "InputPath": "$",
+            "Parameters": {
+              "FunctionName": "getChannelHistory",
+              "Payload": {
+                "year.$": "$.year",
+                "id.$": "$.id",
+                "cursor.$": "$.cursor"
+              }
+            },
+            "TimeoutSeconds": 300,
+            "ResultSelector": {
+              "cursor.$": "$.Payload.cursor",
+              "year.$": "$.Payload.year",
+              "id.$": "$.Payload.id",
+              "hasMore.$": "$.Payload.hasMore"
+            },
+            "ResultPath": "$",
+            "Next": "History Iterator"
+          },
+          "Done": {
+            "Type": "Pass",
+            "End": true
+          }
+        }
+      }
+    },
+    "List Bucket Objects": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke",
+      "Parameters": {
+        "FunctionName": "listObjects",
+        "Payload": {
+          "id.$": "$.id"
+        }
+      },
+      "ResultSelector": {
+        "objects.$": "$.Payload.contents",
+        "id.$": "$.Payload.id"
+      },
+      "ResultPath": "$",
+      "TimeoutSeconds": 300,
+      "Next": "Format Channel History (Concurrent)"
+    },
+    "Format Channel History (Concurrent)": {
+      "Type": "Map",
+      "MaxConcurrency": 4,
+      "ItemsPath": "$.objects",
+      "Parameters": {
+        "key.$": "$$.Map.Item.Value",
+        "id.$": "$.id"
+      },
+      "Next": "Process Superfluous Info",
       "Iterator": {
         "StartAt": "Format Channel History",
         "States": {
@@ -24,20 +129,38 @@
             "Parameters": {
               "FunctionName": "formatHistory",
               "Payload": {
-                "bucket.$": "$.bucket",
                 "key.$": "$.key",
-                "format.$": "$.format",
-                "range.$": "$.range"
+                "id.$": "$.id"
               }
             },
+            "ResultSelector": {
+              "key.$": "$.Payload.key",
+              "id.$": "$.Payload.id"
+            },
+            "ResultPath": "$",
             "TimeoutSeconds": 300,
-            "Next": "Process Superfluous Info"
-          },
-          "Process Superfluous Info": {
-            "Type": "Parallel",
-            "End": true,
-            "Branches": [
-              {
+            "End": true
+          }
+        }
+      }
+    },
+    "Process Superfluous Info": {
+      "Type": "Parallel",
+      "End": true,
+      "Branches": [
+        {
+          "StartAt": "Process Images (Concurrent)",
+          "States": {
+            "Process Images (Concurrent)": {
+              "Type": "Map",
+              "MaxConcurrency": 4,
+              "ItemsPath": "$",
+              "Parameters": {
+                "item.$": "$$.Map.Item.Value"
+              },
+              "OutputPath": "$.[0]",
+              "End": true,
+              "Iterator": {
                 "StartAt": "Process Images",
                 "States": {
                   "Process Images": {
@@ -46,18 +169,35 @@
                     "Parameters": {
                       "FunctionName": "processImages",
                       "Payload": {
-                        "bucket.$": "$.Payload.bucket",
-                        "key.$": "$.Payload.key",
-                        "format.$": "$.Payload.format",
-                        "range.$": "$.Payload.range"
+                        "id.$": "$.item.id",
+                        "key.$": "$.item.key"
                       }
                     },
                     "TimeoutSeconds": 300,
                     "End": true
                   }
                 }
+              }
+            }
+          }
+        },
+        {
+          "StartAt": "Extract Sentences (Concurrent)",
+          "States": {
+            "Extract Sentences (Concurrent)": {
+              "Type": "Map",
+              "MaxConcurrency": 4,
+              "ItemsPath": "$",
+              "Parameters": {
+                "item.$": "$$.Map.Item.Value"
               },
-              {
+              "ResultSelector": {
+                "id.$": "$.[0].Payload.id",
+                "prefix.$": "$.[0].Payload.prefix",
+                "bucket.$": "$.[0].Payload.bucket"
+              },
+              "Next": "Process Sentiment",
+              "Iterator": {
                 "StartAt": "Extract Sentences",
                 "States": {
                   "Extract Sentences": {
@@ -66,10 +206,8 @@
                     "Parameters": {
                       "FunctionName": "extractSentences",
                       "Payload": {
-                        "bucket.$": "$.Payload.bucket",
-                        "key.$": "$.Payload.key",
-                        "format.$": "$.Payload.format",
-                        "range.$": "$.Payload.range"
+                        "id.$": "$.item.id",
+                        "key.$": "$.item.key"
                       }
                     },
                     "TimeoutSeconds": 300,
@@ -77,23 +215,24 @@
                   }
                 }
               }
-            ]
+            },
+            "Process Sentiment": {
+              "Type": "Task",
+              "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
+              "Parameters": {
+                "FunctionName": "getSentiment",
+                "Payload": {
+                  "prefix.$": "$.prefix",
+                  "id.$": "$.id",
+                  "bucket.$": "$.bucket",
+                  "TaskToken.$": "$$.Task.Token"
+                }
+              },
+              "End": true
+            }
           }
         }
-      },
-      "Next": "Process Sentiment"
-    },
-    "Process Sentiment": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
-      "Parameters": {
-        "FunctionName": "getSentiment",
-        "Payload": {
-          "results.$": "$",
-          "TaskToken.$": "$$.Task.Token"
-        }
-      },
-      "End": true
+      ]
     }
   }
 }
