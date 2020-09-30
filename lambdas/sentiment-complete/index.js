@@ -2,6 +2,7 @@ const path = require('path');
 
 const { EOL } = require('os');
 
+const pLimit = require('p-limit');
 const tar = require('tar');
 
 const { DynamoDB, S3, StepFunctions } = require('aws-sdk');
@@ -11,6 +12,8 @@ const { mapDBProps } = require('@nlp-slack/helpers');
 const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey, endpoint });
 const s3 = new S3({ region, accessKeyId, secretAccessKey, s3ForcePathStyle: true, endpoint });
 const stepFunctions = new StepFunctions({ region, accessKeyId, secretAccessKey, endpoint });
+
+const limit = pLimit(1);
 
 function getObjectAndParse(params) {
   return new Promise((resolve) => {
@@ -53,22 +56,24 @@ exports.handler = (event) => {
     }, {});
 
     await Promise.all(
-      Object.entries(dynamoDBMap).map(([prop, val]) => {
-        const extension = path.extname(prop);
-        const ts = path.basename(prop, extension);
+      Object.entries(dynamoDBMap).map(([prop, val]) =>
+        limit(() => {
+          const extension = path.extname(prop);
+          const ts = path.basename(prop, extension);
 
-        const updateParams = {
-          TableName: tableName,
-          Key: { ts: { S: ts } },
-          UpdateExpression: 'SET #SENTIMENT = :SENTIMENT',
-          ExpressionAttributeNames: { '#SENTIMENT': 'SENTIMENT' },
-          ExpressionAttributeValues: {
-            ':SENTIMENT': mapDBProps(val),
-          },
-        };
+          const updateParams = {
+            TableName: tableName,
+            Key: { ts: { S: ts } },
+            UpdateExpression: 'SET #SENTIMENT = :SENTIMENT',
+            ExpressionAttributeNames: { '#SENTIMENT': 'SENTIMENT' },
+            ExpressionAttributeValues: {
+              ':SENTIMENT': mapDBProps(val),
+            },
+          };
 
-        return dynamodb.updateItem(updateParams).promise();
-      }),
+          return dynamodb.updateItem(updateParams).promise();
+        }),
+      ),
     );
 
     const { dir } = path.parse(key);
