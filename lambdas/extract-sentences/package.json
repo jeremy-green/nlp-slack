@@ -1,5 +1,6 @@
 {
   "name": "@nlp-slack/extract-sentences",
+  "functionName": "extractSentences",
   "version": "0.0.0",
   "description": "",
   "keywords": [],
@@ -8,7 +9,9 @@
   "main": "lambda_function.py",
   "scripts": {
     "build": "mkdir -p ../../tmp && zip -r ../../tmp/extract-sentences.zip lambda_function.py",
+    "build-local": "docker build -t lambdalayer:latest . && docker run --name lambdalayer lambdalayer:latest && docker cp lambdalayer:tmp/python.zip ../../tmp/ && docker rm -f lambdalayer && zip -ur ../../tmp/python.zip ./lambda_function.py && mv ../../tmp/python.zip ../../tmp/extract-sentences.zip",
     "update": "aws lambda update-function-code --function extractSentences --zip-file fileb://../../tmp/extract-sentences.zip",
+    "update-local": "npm run build-local && aws --endpoint-url http://localhost:4566 lambda update-function-code --function extractSentences --zip-file fileb://../../tmp/extract-sentences.zip",
     "lint": "source ../../v-env/bin/activate && flake8 lambda_function.py && deactivate",
     "publish": "npm run lint &&  npm run build && npm run update"
   }

@@ -7,11 +7,12 @@ RUN yum install -y python37 && \
 
 RUN python3.7 -m pip install --upgrade pip && \
     python3.7 -m pip install virtualenv
-    
+
 RUN python3.7 -m venv nltk && \
     source nltk/bin/activate && \
     pip install nltk -t ./python && \
     deactivate && \
-    zip -r python.zip ./python/ && \
+    cd ./python/ && \
+    zip -r ../python.zip . && \
+    cd .. && \
     mv python.zip /tmp
-    

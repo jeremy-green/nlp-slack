@@ -7,6 +7,8 @@ nltk.data.path.append("/tmp")
 nltk.download("punkt", download_dir="/tmp")
 
 prefix = os.getenv("S3_PREFIX")
+bucket = os.getenv("S3_BUCKET")
+endpoint = os.getenv("AWS_ENDPOINT_URL")
 
 max_items = 25
 max_length = 4500
@@ -27,16 +29,12 @@ def get_filtered_setences(text):
 
 
 def lambda_handler(event, context):
-    client = boto3.client("s3")
+    client = boto3.client("s3", endpoint_url=endpoint)
 
-    bucket = event["bucket"]
-    s3_range = event["range"]
+    id = event["id"]
     key = event["key"]
 
-    response = client.get_object(
-        Bucket=bucket,
-        Key=key,
-    )
+    response = client.get_object(Bucket=bucket, Key=key)
 
     messages = json.loads(response["Body"].read().decode("utf-8"))
     for message in messages:
@@ -45,12 +43,10 @@ def lambda_handler(event, context):
         filtered_sentences = get_filtered_setences(message["text"])
 
         if client_msg_id is not None and len(filtered_sentences) > 0:
-            format = "txt"
-            s3_key = "{}/{}/{}.{}".format(
+            s3_key = "{}/{}/{}.txt".format(
                 prefix,
-                s3_range,
+                id,
                 ts,
-                format,
             )
 
             client.put_object(
@@ -59,4 +55,4 @@ def lambda_handler(event, context):
                 Key=s3_key,
             )
 
-    return {"range": s3_range, "bucket": bucket, "prefix": prefix}
+    return {"id": id, "prefix": prefix, "bucket": bucket}
