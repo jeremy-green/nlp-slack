@@ -1,0 +1,19 @@
+{
+  "name": "@nlp-slack/configure-process",
+  "functionName": "configureProcess",
+  "version": "0.0.0",
+  "description": "",
+  "keywords": [],
+  "author": "Jeremy Green <hello@jeremy.green>",
+  "license": "ISC",
+  "main": "index.js",
+  "scripts": {
+    "build": "mkdir -p ../../tmp && zip -r ../../tmp/configure-process.zip . -x \"__tests__/*\" \"__mocks__/*\" \".jest/*\"",
+    "update": "aws lambda update-function-code --function configureProcess --zip-file fileb://../../tmp/configure-process.zip",
+    "update-local": "aws --endpoint-url http://localhost:4566 lambda update-function-code --function configureProcess --zip-file fileb://../../tmp/configure-process.zip",
+    "publish": "npm run build && npm run update"
+  },
+  "dependencies": {
+    "config": "^3.3.2"
+  }
+}

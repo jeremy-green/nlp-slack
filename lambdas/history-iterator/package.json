@@ -1,0 +1,19 @@
+{
+  "name": "@nlp-slack/history-iterator",
+  "functionName": "historyIterator",
+  "version": "0.0.0",
+  "description": "",
+  "keywords": [],
+  "author": "Jeremy Green <hello@jeremy.green>",
+  "license": "ISC",
+  "main": "index.js",
+  "scripts": {
+    "build": "mkdir -p ../../tmp && zip -r ../../tmp/history-iterator.zip . -x \"__tests__/*\" \"__mocks__/*\" \".jest/*\"",
+    "update": "aws lambda update-function-code --function historyIterator --zip-file fileb://../../tmp/history-iterator.zip",
+    "update-local": "aws --endpoint-url http://localhost:4566 lambda update-function-code --function historyIterator --zip-file fileb://../../tmp/history-iterator.zip",
+    "publish": "npm run build && npm run update"
+  },
+  "dependencies": {
+    "uuid": "^8.3.0"
+  }
+}

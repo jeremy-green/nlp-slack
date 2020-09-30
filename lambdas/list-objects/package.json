@@ -1,0 +1,21 @@
+{
+  "name": "@nlp-slack/list-objects",
+  "functionName": "listObjects",
+  "version": "0.0.0",
+  "description": "",
+  "keywords": [],
+  "author": "Jeremy Green <hello@jeremy.green>",
+  "license": "ISC",
+  "main": "index.js",
+  "scripts": {
+    "build": "mkdir -p ../../tmp && zip -r ../../tmp/list-objects.zip .",
+    "update": "aws lambda update-function-code --function listObjects --zip-file fileb://../../tmp/list-objects.zip",
+    "update-local": "aws --endpoint-url http://localhost:4566 lambda update-function-code --function listObjects --zip-file fileb://../../tmp/list-objects.zip",
+    "publish": "npm run build && npm run update",
+    "lint": "npx eslint index.js",
+    "test": "echo \"Error: run tests from root\" && exit 1"
+  },
+  "dependencies": {
+    "config": "^3.3.2"
+  }
+}
