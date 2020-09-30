@@ -1,5 +1,6 @@
 {
   "name": "@nlp-slack/format-history",
+  "functionName": "formatHistory",
   "version": "0.0.0",
   "description": "",
   "keywords": [],
@@ -9,6 +10,7 @@
   "scripts": {
     "build": "mkdir -p ../../tmp && zip -r ../../tmp/format-history.zip .",
     "update": "aws lambda update-function-code --function formatHistory --zip-file fileb://../../tmp/format-history.zip",
+    "update-local": "aws --endpoint-url http://localhost:4566 lambda update-function-code --function formatHistory --zip-file fileb://../../tmp/format-history.zip",
     "publish": "npm run build && npm run update",
     "lint": "npx eslint index.js",
     "test": "echo \"Error: run tests from root\" && exit 1"

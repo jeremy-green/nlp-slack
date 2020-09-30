@@ -3,5 +3,7 @@
   "bucket": "S3_BUCKET",
   "prefix": "S3_PREFIX",
   "secretAccessKey": "SECRET_ACCESS_KEY",
-  "region": "AWS_REGION"
+  "region": "AWS_REGION",
+  "endpoint": "AWS_ENDPOINT_URL",
+  "tableName": "DYNAMODB_TABLE_NAME"
 }
