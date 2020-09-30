@@ -9,7 +9,10 @@
   "license": "ISC",
   "scripts": {
     "test": "jest",
-    "lint": "eslint ./lambdas/**/index.js"
+    "lint": "eslint ./lambdas/**/index.js",
+    "dev": "lerna run dev --stream",
+    "push": "lerna run publish --stream",
+    "seed": "node scripts/setup.js"
   },
   "dependencies": {
     "@slack-wrench/jest-mock-web-client": "^1.2.0",

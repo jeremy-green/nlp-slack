@@ -1,4 +1,4 @@
 {
-  "packages": ["packages/*", "lambdas/*"],
+  "packages": ["apps/*", "packages/*", "lambdas/*"],
   "version": "0.0.0"
 }
