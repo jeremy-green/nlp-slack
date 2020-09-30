@@ -1,5 +1,6 @@
 {
   "name": "@nlp-slack/process-images",
+  "functionName": "processImages",
   "version": "0.0.0",
   "description": "",
   "keywords": [],

@@ -5,14 +5,14 @@ const { EOL } = require('os');
 const tar = require('tar');
 
 const { DynamoDB, S3, StepFunctions } = require('aws-sdk');
-const { accessKeyId, secretAccessKey, region } = require('config');
+const { accessKeyId, secretAccessKey, region, endpoint, tableName } = require('config');
 const { mapDBProps } = require('@nlp-slack/helpers');
 
-const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
-const s3 = new S3({ region, accessKeyId, secretAccessKey });
-const stepFunctions = new StepFunctions({ region, accessKeyId, secretAccessKey });
+const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey, endpoint });
+const s3 = new S3({ region, accessKeyId, secretAccessKey, s3ForcePathStyle: true, endpoint });
+const stepFunctions = new StepFunctions({ region, accessKeyId, secretAccessKey, endpoint });
 
-async function getObjectAndParse(params) {
+function getObjectAndParse(params) {
   return new Promise((resolve) => {
     s3.getObject(params)
       .createReadStream()
@@ -58,7 +58,7 @@ exports.handler = (event) => {
         const ts = path.basename(prop, extension);
 
         const updateParams = {
-          TableName: 'messages',
+          TableName: tableName,
           Key: { ts: { S: ts } },
           UpdateExpression: 'SET #SENTIMENT = :SENTIMENT',
           ExpressionAttributeNames: { '#SENTIMENT': 'SENTIMENT' },

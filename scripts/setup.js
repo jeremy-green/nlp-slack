@@ -36,12 +36,13 @@ const getEnvValue = (curr, name) => {
     DATA_ACCESS_ROLEARN: 'arn:aws:iam::123456789012:role/data-access-role',
     BOT_TOKEN: 'xxxx-xxxxxxxxx-xxxx',
     SLACK_CHANNEL: 'C1234567890',
-    FULL_HISTORY: 'false',
+    FULL_HISTORY: 'true',
     SLACK_API_URL: 'http://node:3000/api/',
     AWS_ENDPOINT_URL: 'http://localstack:4566',
     DYNAMODB_TABLE_NAME: tableName,
-    PROCESS_YEARS: '2020',
+    PROCESS_YEARS: '2020,2019,2018',
     PROCESS_ID: 'uuidv4',
+    COMPREHEND_ENDPOINT_URL: 'http://node:3000/api/aws/comprehend',
   };
 
   return staticEnvConfigMap[curr];

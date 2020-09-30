@@ -2,12 +2,12 @@ const fetch = require('node-fetch');
 const pLimit = require('p-limit');
 
 const { DynamoDB, Rekognition, S3 } = require('aws-sdk');
-const { accessKeyId, secretAccessKey, region, botToken } = require('config');
+const { accessKeyId, secretAccessKey, region, botToken, endpoint, bucket } = require('config');
 const { mapDBProps } = require('@nlp-slack/helpers');
 
-const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey });
-const rekognition = new Rekognition({ region, accessKeyId, secretAccessKey });
-const s3 = new S3({ region, accessKeyId, secretAccessKey });
+const dynamodb = new DynamoDB({ region, accessKeyId, secretAccessKey, endpoint });
+const rekognition = new Rekognition({ region, accessKeyId, secretAccessKey, endpoint });
+const s3 = new S3({ region, accessKeyId, secretAccessKey, endpoint, s3ForcePathStyle: true });
 
 const limit = pLimit(1);
 
@@ -61,7 +61,9 @@ async function handleImage({ ts, files }) {
   return dynamodb.updateItem(payload).promise();
 }
 
-exports.handler = async ({ key, bucket }) => {
+exports.handler = async (event) => {
+  console.log(event);
+  const { key } = event;
   const params = { Key: key, Bucket: bucket };
   const data = await s3.getObject(params).promise();
   const messages = JSON.parse(data.Body.toString('utf-8'));

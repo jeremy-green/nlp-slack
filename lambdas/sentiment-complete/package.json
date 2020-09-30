@@ -1,5 +1,6 @@
 {
   "name": "@nlp-slack/sentiment-complete",
+  "functionName": "sentimentComplete",
   "version": "0.0.0",
   "description": "",
   "keywords": [],

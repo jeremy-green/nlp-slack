@@ -1,5 +1,7 @@
 {
   "accessKeyId": "ACCESS_KEY_ID",
   "secretAccessKey": "SECRET_ACCESS_KEY",
-  "region": "AWS_REGION"
+  "region": "AWS_REGION",
+  "endpoint": "AWS_ENDPOINT_URL",
+  "tableName": "DYNAMODB_TABLE_NAME"
 }

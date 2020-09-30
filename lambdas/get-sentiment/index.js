@@ -4,28 +4,32 @@ const {
   secretAccessKey,
   region,
   dataAccessRoleArn,
+  endpoint,
+  comprehendEndpoint,
   prefix: outputPrefix,
   bucket: outputBucket,
 } = require('config');
 
-const comprehend = new Comprehend({ region, accessKeyId, secretAccessKey });
-const s3 = new S3({ region, accessKeyId, secretAccessKey });
+const comprehend = new Comprehend({
+  region,
+  accessKeyId,
+  secretAccessKey,
+  endpoint: comprehendEndpoint,
+});
+const s3 = new S3({ region, accessKeyId, secretAccessKey, endpoint, s3ForcePathStyle: true });
 exports.handler = async (event) => {
   console.log(event);
-  const { results, TaskToken: taskToken } = event;
-  const {
-    Payload: { bucket: inputBucket, range, prefix: inputPrefix },
-  } = results.find((result) => result.Payload);
+  const { TaskToken: taskToken, bucket: inputBucket, prefix: inputPrefix, id } = event;
   const params = {
     DataAccessRoleArn: dataAccessRoleArn,
     InputDataConfig: {
-      S3Uri: `s3://${inputBucket}/${inputPrefix}/${range}`,
+      S3Uri: `s3://${inputBucket}/${inputPrefix}/${id}`,
       InputFormat: 'ONE_DOC_PER_LINE',
     },
     LanguageCode: 'en',
-    JobName: range,
+    JobName: id,
     OutputDataConfig: {
-      S3Uri: `s3://${outputBucket}/${outputPrefix}/${range}`,
+      S3Uri: `s3://${outputBucket}/${outputPrefix}/${id}`,
     },
   };
   const result = await comprehend.startSentimentDetectionJob(params).promise();
@@ -34,7 +38,7 @@ exports.handler = async (event) => {
     .putObject({
       Body: Buffer.from(JSON.stringify({ ...result, taskToken })),
       Bucket: outputBucket,
-      Key: `${outputPrefix}/${range}/event-details.json`,
+      Key: `${outputPrefix}/${id}/event-details.json`,
     })
     .promise();
 

@@ -2,7 +2,9 @@
   "accessKeyId": "ACCESS_KEY_ID",
   "bucket": "S3_BUCKET",
   "prefix": "S3_PREFIX",
+  "endpoint": "AWS_ENDPOINT_URL",
   "secretAccessKey": "SECRET_ACCESS_KEY",
   "region": "AWS_REGION",
-  "dataAccessRoleArn": "DATA_ACCESS_ROLEARN"
+  "dataAccessRoleArn": "DATA_ACCESS_ROLEARN",
+  "comprehendEndpoint": "COMPREHEND_ENDPOINT_URL"
 }
