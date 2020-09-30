@@ -1,10 +1,12 @@
 {
   "accessKeyId": "ACCESS_KEY_ID",
   "botToken": "BOT_TOKEN",
+  "endpoint": "AWS_ENDPOINT_URL",
   "bucket": "S3_BUCKET",
   "prefix": "S3_PREFIX",
   "secretAccessKey": "SECRET_ACCESS_KEY",
   "channel": "SLACK_CHANNEL",
   "fullHistory": "FULL_HISTORY",
-  "region": "AWS_REGION"
+  "region": "AWS_REGION",
+  "slackApiUrl": "SLACK_API_URL"
 }

@@ -1,5 +1,6 @@
 {
   "name": "@nlp-slack/channel-history",
+  "functionName": "getChannelHistory",
   "version": "0.0.0",
   "description": "> TODO: description",
   "author": "Jeremy Green <hello@jeremy.green>",
@@ -9,11 +10,13 @@
   "scripts": {
     "build": "mkdir -p ../../tmp && zip -r ../../tmp/channel-history.zip . -x \"__tests__/*\" \"__mocks__/*\" \".jest/*\"",
     "update": "aws lambda update-function-code --function getChannelHistory --zip-file fileb://../../tmp/channel-history.zip",
+    "update-local": "aws --endpoint-url http://localhost:4566 lambda update-function-code --function getChannelHistory --zip-file fileb://../../tmp/channel-history.zip",
     "publish": "npm run build && npm run update"
   },
   "dependencies": {
     "@slack/web-api": "^5.10.0",
-    "config": "^3.3.1"
+    "config": "^3.3.1",
+    "uuid": "^8.3.0"
   },
   "jest": {
     "collectCoverage": true,
