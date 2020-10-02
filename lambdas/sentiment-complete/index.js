@@ -66,9 +66,7 @@ exports.handler = (event) => {
             Key: { ts: { S: ts } },
             UpdateExpression: 'SET #SENTIMENT = :SENTIMENT',
             ExpressionAttributeNames: { '#SENTIMENT': 'SENTIMENT' },
-            ExpressionAttributeValues: {
-              ':SENTIMENT': mapDBProps(val),
-            },
+            ExpressionAttributeValues: { ':SENTIMENT': mapDBProps(val) },
           };
 
           return dynamodb.updateItem(updateParams).promise();
